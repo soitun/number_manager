@@ -23,6 +23,7 @@ require_once 'lib/restler/restler.php';
 
 $r = new Restler();
 $r->setSupportedFormats('JsonFormat');
+$r->addAPIClass('utils');
 $r->addAPIClass('numbers');
 //$r->addAuthenticationClass('AccessControl');
 $r->handle();

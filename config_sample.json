@@ -1,1 +1,7 @@
-config_sample.json
+{
+    "version": "1.0",
+    "account_id": "",
+    "api_url": "",
+    "username": "",
+    "password": ""
+}
