@@ -12,6 +12,7 @@ define("ROOT_PATH", dirname(__FILE__) . '/');
 
 require_once 'helper/settings.php';
 require_once 'helper/utils.php';
+require_once 'lib/restler/restler.php';
 
 // CORS
 header('Access-Control-Allow-Headers:Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control, X-Auth-Token');
@@ -19,12 +20,10 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Origin:*');
 header('Access-Control-Max-Age:86400');
 
-require_once 'lib/restler/restler.php';
-
 $r = new Restler();
 $r->setSupportedFormats('JsonFormat');
-$r->addAPIClass('utils');
 $r->addAPIClass('numbers');
+$r->addAPIClass('utilities');
 //$r->addAuthenticationClass('AccessControl');
 $r->handle();
 

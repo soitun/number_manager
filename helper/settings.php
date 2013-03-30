@@ -11,6 +11,11 @@
 class Settings {
     private $_objSettings = null;
 
+    public static function get_instance() {
+        $objSettings = new Settings;
+        return $objSettings->get_settings();
+    }
+
     public function __construct() {
         $arr_file_content = json_decode(file_get_contents(ROOT_PATH . 'config.json'), true);
         $this->_objSettings = $this->_array_to_object($arr_file_content);
