@@ -523,8 +523,7 @@ class Restler extends EventEmitter
                     throw new RestException (
                         500, 'Filter Class ' .
                         'should implement iFilter');
-                } else {
-                    $ok = $filterObj->__isAllowed();
+                } else if (!($ok = $filterObj->__isAllowed())) {
                     if (is_null($ok)
                         && $filterObj instanceof iUseAuthentication
                     ) {
@@ -614,7 +613,7 @@ class Restler extends EventEmitter
                     // TODO:check if the api version requested is allowed by class
                     if (Defaults::$autoValidationEnabled) {
                         foreach ($o->metadata['param'] as $index => $param) {
-                            $info = &$param [CommentParser::$embeddedDataName];
+                            $info = & $param [CommentParser::$embeddedDataName];
                             if (!isset ($info['validate'])
                                 || $info['validate'] != false
                             ) {
@@ -763,8 +762,14 @@ class Restler extends EventEmitter
                 ), $data);
             }
         } else {
-            $message = RestException::$codes[$statusCode] .
-                (empty($statusMessage) ? '' : ': ' . $statusMessage);
+            if (isset(RestException::$codes[$statusCode])) {
+                $message = RestException::$codes[$statusCode] .
+                    (empty($statusMessage) ? '' : ': ' . $statusMessage);
+            } else {
+                trigger_error("Non standard http status codes [currently $statusCode] are discouraged", E_USER_WARNING);
+                $message = $statusMessage;
+
+            }
             $this->setStatus($statusCode);
             $data = $this->responseFormat->encode(
                 $responder->formatError($statusCode, $message),
@@ -943,7 +948,7 @@ class Restler extends EventEmitter
                 } elseif (false !== ($index = strrpos($accept, '+'))) {
                     $mime = substr($accept, 0, $index);
                     if (is_string(Defaults::$apiVendor)
-                        && 0 === strpos($mime,
+                        && 0 === stripos($mime,
                             'application/vnd.'
                                 . Defaults::$apiVendor . '-v')
                     ) {
@@ -1064,7 +1069,6 @@ class Restler extends EventEmitter
         $currentUrl = 'v' . $this->requestedApiVersion;
         if (!empty($this->url))
             $currentUrl .= '/' . $this->url;
-        $lc = strtolower($currentUrl);
         foreach ($urls as $url => $call) {
             $this->trigger('onRoute', array('url' => $url, 'target' => $call));
             $call = (object)$call;
@@ -1095,7 +1099,7 @@ class Restler extends EventEmitter
                     $found = true;
                     break;
                 }
-            } elseif ($url == $lc) {
+            } elseif (0 === strcasecmp($url, $currentUrl)) {
                 $found = true;
                 break;
             }
@@ -1196,7 +1200,7 @@ class Restler extends EventEmitter
                 if (!isset($metadata['param'][$position])) {
                     $metadata['param'][$position] = array();
                 }
-                $m = &$metadata ['param'] [$position];
+                $m = & $metadata ['param'] [$position];
                 if (isset($type)) {
                     $m['type'] = $type;
                 }
