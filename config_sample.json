@@ -1,7 +1,16 @@
 {
     "version": "1.0",
-    "account_id": "",
-    "api_url": "",
-    "username": "",
-    "password": ""
+    
+    "providers": {
+        "dev": {
+            "bandwidth": {
+                "account_id": "",
+                "api_url": "",
+                "site_id": "",
+                "peer_id": "",
+                "username": "",
+                "password": ""
+            }
+        }
+    }
 }
