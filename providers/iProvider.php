@@ -1,7 +1,7 @@
 <?php 
 
 interface iProvider {
-    public function search($pattern, $contiguous);
+    public function search($request_data);
 }
 
 ?>
