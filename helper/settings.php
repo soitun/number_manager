@@ -8,11 +8,11 @@
  * @version 1.0
  */
 
-class Settings {
+class helper_settings {
     private $_objSettings = null;
 
     public static function get_instance() {
-        $objSettings = new Settings;
+        $objSettings = new helper_settings();
         return $objSettings->get_settings();
     }
 

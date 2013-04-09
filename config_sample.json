@@ -1,5 +1,13 @@
 {
     "version": "1.0",
+
+    "database": {
+        "database_host": "localhost",
+        "database_name": "number_db",
+        "database_charset": "utf8",
+        "database_user": "root",
+        "database_password": "root"
+    },
     
     "providers": {
         "dev": {
@@ -9,7 +17,8 @@
                 "site_id": "",
                 "peer_id": "",
                 "username": "",
-                "password": ""
+                "password": "",
+                "wait_timer": "2"
             }
         }
     }

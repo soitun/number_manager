@@ -17,7 +17,7 @@ class NumberManagerAutoload {
         ));
     }
 
-    public static function autoload($class) {       
+    public static function autoload($class) {
         // If for some reason we get here and the class is already loaded, return
         if (class_exists($class, FALSE)) {
             return TRUE;
@@ -25,8 +25,8 @@ class NumberManagerAutoload {
 
         // Try to include the class
         $file = str_replace('_', DIRECTORY_SEPARATOR, $class) . '.php';
-        if (is_file(PROVISIONER_BASE . $file)) {
-            require_once(PROVISIONER_BASE . $file);
+        if (is_file(ROOT_PATH . $file)) {
+            require_once(ROOT_PATH . $file);
 
             return TRUE;
         }

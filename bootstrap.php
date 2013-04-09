@@ -6,6 +6,9 @@
  * @package Number_manager
  */
 
+// Define ENV constants
+define("ENVIRONMENT", "dev");
+
 // Define default directories
 define("ROOT_PATH", dirname(__FILE__) . '/');
 define("CERTS_PATH", ROOT_PATH . 'certs/');
