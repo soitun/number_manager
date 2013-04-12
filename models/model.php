@@ -23,16 +23,21 @@ abstract class models_model {
     }
 
     function __destruct() {
-        $this->_db = null;
+        //$this->_db = null;
     }
 
     private function _init_mysql() {
         // Set the DSN (the string that determines what driver to user and how)
-        $dsn = "mysql:host=" . $this->_database_settings->database_host . ";dbname=" . $this->_database_settings->database_name . ";charset=" . $this->_database_settings->database_charset;
+        $dsn = "mysql:host=" . $this->_database_settings->database_host . ";dbname=" . $this->_database_settings->database_name . ";charset=" . $this->_database_settings->database_charset;        
         // Set the driver parameters
         $drvr_params = array(PDO::ATTR_EMULATE_PREPARES => false, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
         // Creating a connexion
-        $this->_db = new PDO($dsn, $this->_database_settings->database_user, $this->_database_settings->database_password, $drvr_params);
+
+        try {
+            $this->_db = new PDO($dsn, $this->_database_settings->database_user, $this->_database_settings->database_password, $drvr_params);
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
     }
 }
 

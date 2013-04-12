@@ -58,8 +58,8 @@ class providers_bandwidth_provider implements providers_iprovider {
 
             $xml_number_result = simplexml_load_string(curl_exec($this->_curl));
 
-            // Creating first block
-            $obj_block = new models_block("bandwidth");
+            // Numbers array
+            $arr_numbers = array();
             foreach ($xml_number_result->TelephoneNumberList->TelephoneNumber as $number) {
                 // Creating number model
                 $obj_number = new models_number("bandwidth");
@@ -68,35 +68,57 @@ class providers_bandwidth_provider implements providers_iprovider {
                 $obj_number->set_state($state);
                 $obj_number->insert();
 
-
+                // building the number array
+                $arr_numbers[] = (int)$number;
             }
-            die();
+
+            // Sort from lowest to highest
+            $arr_numbers = array_unique($arr_numbers, SORT_NUMERIC);
+            sort($arr_numbers);
+
+            print_r($arr_numbers);
+
+            // Blocks
+            $cur_block = new models_block("bandwidth");
+            $cur_block->set_start_number($arr_numbers[0]);
+            $previous_number = null;
+            for ($i=0; $i < count($arr_numbers); $i++) { 
+                $current = (int)substr($arr_numbers[$i], -4);
+                $next = (int)substr($arr_numbers[$i+1], -4);
+
+                echo "Entering loop\n";
+                $nplus1 = $arr_numbers[$i+1];
+                $n = $arr_numbers[$i];
+                echo "arr + 1 is: $nplus1\n";
+                echo "next is : $next\n";
+
+                if($next) {
+                    echo "in next \n";
+                    if($next == $current + 1) {
+                        echo "inside group for $n\n";
+                        continue;
+                    } else {
+                        $cur_block->set_end_number($arr_numbers[$i]);
+                        if ($cur_block->insert()) {
+                            $cur_block = null;
+                            $cur_block = new models_block("bandwidth");
+                            $cur_block->set_start_number($arr_numbers[$i+1]);
+                        } else 
+                            exit('Could not save a block');
+                    }
+                } else {
+                    echo "not in next \n";
+                    $cur_block->set_end_number($arr_numbers[$i]);
+                    if ($cur_block->insert()) {
+                        continue;
+                    } else 
+                        exit('Could not save a block');
+                }
+            }
+
+            sleep($this->_settings->wait_timer);
         }
     }
-
-    /*public function search($request_data) {
-        if (isset($request_data['area_code']))
-            $url = $this->_settings->api_url . "accounts/" . $this->_settings->account_id . "/availableNumbers?&areaCode=" . $request_data['area_code'];
-        elseif (isset($request_data['city']) && isset($request_data['state']))
-            $url = $this->_settings->api_url . "accounts/" . $this->_settings->account_id . "/availableNumbers?city=" . $request_data['city'] . "&state=" . $request_data['state'];
-        else
-            return array();
-
-        curl_setopt_array($this->_curl, array(
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_URL => $url,
-            CURLOPT_POSTFIELDS => null
-        ));
-
-        return curl_exec($this->_curl);
-
-        //$xmlresult = simplexml_load_string(curl_exec($this->_curl));
-
-        if ($xmlresult->ResultCount != 0)
-            return $xmlresult->TelephoneNumberList;
-        else
-            return array();
-    }*/
 }
 
 ?>

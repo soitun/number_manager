@@ -45,8 +45,18 @@ class models_block extends models_model {
         parent::__construct($provider);
     }
 
-    function __destruct() {
-        parent::__destruct();
+    public function insert() {
+        echo "insert \n";
+
+        $this->_size = ($this->_end_number - $this->_start_number) + 1;
+        try {
+            $stmt = $this->_db->prepare("INSERT INTO `blocks`(`size`, `start_number`, `end_number`, `provider`) VALUES(?, ?, ?, ?)");
+            $stmt->execute(array($this->_size, $this->_start_number, $this->_end_number, $this->_provider));
+        } catch (PDOException $e) {
+            return true;
+        }
+
+        return true;
     }
 }
     

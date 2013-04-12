@@ -73,8 +73,10 @@ class models_number extends models_model {
             $stmt = $this->_db->prepare("INSERT INTO `numbers`(`number`, `provider`, `cache_update`, `city`, `state`) VALUES(?, ?, now(), ?, ?)");
             $stmt->execute(array($this->_number, $this->_provider, $this->_city, $this->_state));
         } catch (PDOException $e) {
-            echo($e->getMessage() . "\n");
+            return true;
         }
+
+        return true;
     }
 }
 
