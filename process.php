@@ -21,12 +21,16 @@ if(!file_exists($farea_code))
     die("Could not find the file\n");
 
 switch ($command) {
-    case 'sync':
+    case 'sync_db':
         $sync_obj = new scripts_syncdb($farea_code);
         $sync_obj->sync();
         break;
-    
+
+    case 'sync_city':
+        $sync_obj = new scripts_synccity();
+        $sync_obj->sync();
+
     default:
         echo("ERROR: Wrong command\n");
-        echo("Available commands: sync\n");
+        echo("Available commands: sync_db / sync_city\n");
 }
