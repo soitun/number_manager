@@ -1,7 +1,7 @@
 <?php 
 
 /**
- * Represent the class that will manage the Bandidth-manager's settings
+ * Represent the class that will manage the number manager's settings
  *
  * @author Francis Genet
  * @package Bandwidth-manager

@@ -7,6 +7,7 @@
  */
 
 // Define ENV constants
+// "dev" or "prod"
 define("ENVIRONMENT", "dev");
 
 // Define default directories
