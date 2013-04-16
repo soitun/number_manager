@@ -20,6 +20,18 @@
                 "password": "",
                 "wait_timer": "2"
             }
+        },
+
+        "prod": {
+            "bandwidth": {
+                "account_id": "",
+                "api_url": "",
+                "site_id": "",
+                "peer_id": "",
+                "username": "",
+                "password": "",
+                "wait_timer": "2"
+            }
         }
     }
 }
