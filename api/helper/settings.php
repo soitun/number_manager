@@ -1,10 +1,10 @@
 <?php 
 
 /**
- * Represent the class that will manage the Bandidth-manager's settings
+ * Represent the class that will manage the APIs number manger's settings
  *
  * @author Francis Genet
- * @package Bandwidth-manager
+ * @package Number_manager_api
  * @version 1.0
  */
 
