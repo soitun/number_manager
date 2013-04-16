@@ -4,11 +4,13 @@
  * This is the entry point for the APIs
  *
  * @author Francis Genet
- * @package Bandwidth-manager
+ * @package Number_manager_api
  * @version 1.0
  */
 
-require_once 'helper/settings.php';
+// Bootstrap
+require_once 'bootstrap.php';
+
 require_once 'lib/restler/restler.php';
 
 use Luracast\Restler\Restler;
@@ -21,6 +23,7 @@ header('Access-Control-Max-Age:86400');
 
 $r = new Restler();
 $r->setSupportedFormats('JsonFormat');
+$r->addAPIClass('numbers');
 //$r->addAuthenticationClass('AccessControl');
 $r->handle();
 
