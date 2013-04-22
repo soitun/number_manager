@@ -3,15 +3,18 @@
 class providers_bandwidth_provider implements providers_iprovider {
     private $_curl;
     private $_settings;
-    private $_db;
+    private $_obj_number;
+    private $_obj_block;
 
     function __construct() {
+        echo "Constructor \n";
         $general_settings = helper_settings::get_instance();
         $this->_settings = $general_settings->providers->{ENVIRONMENT}->bandwidth;
         $this->_init_curl();
     }
 
     function __destruct() {
+        echo "Destructor \n";
         curl_close($this->_curl);
         $this->_db = null;
     }
@@ -31,10 +34,40 @@ class providers_bandwidth_provider implements providers_iprovider {
         ));
     }
 
-    public function sync($area_code) {
-        if (!$area_code)
-            die("Empty area code\n");
+    private function _insert_block($arr_numbers) {
+        // Blocks
+        $this->_obj_block->set_start_number($arr_numbers[0]);
+        $previous_number = null;
+        for ($i=0; $i < count($arr_numbers); $i++) { 
+            $current = (int)substr($arr_numbers[$i], -4);
+            $next = (int)substr($arr_numbers[$i+1], -4);
 
+            echo 'Currently on: ' . $arr_numbers[$i] . "\n";
+
+            if($next) {
+                echo "in next \n";
+                if($next == $current + 1) {
+                    echo "inside group for $n\n";
+                    continue;
+                } else {
+                    $this->_obj_block->set_end_number($arr_numbers[$i]);
+                    if ($this->_obj_block->insert()) {
+                        $this->_obj_block->set_start_number($arr_numbers[$i+1]);
+                    } else 
+                        exit('Could not save a block');
+                }
+            } else {
+                echo "not in next \n";
+                $this->_obj_block->set_end_number($arr_numbers[$i]);
+                if ($this->_obj_block->insert()) {
+                    continue;
+                } else 
+                    exit('Could not save a block');
+            }
+        }
+    }
+
+    private function _get_available_npa_nxx($area_code) {
         $url = $this->_settings->api_url . "accounts/" . $this->_settings->account_id . "/availableNpaNxx?&areaCode=" . $area_code;
 
         curl_setopt_array($this->_curl, array(
@@ -43,78 +76,110 @@ class providers_bandwidth_provider implements providers_iprovider {
             CURLOPT_POSTFIELDS => null
         ));
 
-        $xml_result = simplexml_load_string(curl_exec($this->_curl));
+        return simplexml_load_string(curl_exec($this->_curl));
+    }
 
+    private function _get_available_numbers_by_npa_nxx($npanxx) {
+        $url = $this->_settings->api_url . "accounts/" . $this->_settings->account_id . "/availableNumbers?&npaNxx=" . $npanxx;
+
+        curl_setopt_array($this->_curl, array(
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_URL => $url,
+            CURLOPT_POSTFIELDS => null
+        ));
+
+        return simplexml_load_string(curl_exec($this->_curl));
+    }
+
+    public function update($area_code) {
+        if (!$area_code)
+            die("Empty area code\n");
+
+        // Creating models
+        $this->_obj_number = new models_number("bandwidth");
+        $this->_obj_block = new models_block("bandwidth");
+
+        $this->_obj_number->set_db_name('US_' . $area_code);
+
+        $xml_result = $this->_get_available_npa_nxx($area_code);
         foreach ($xml_result->AvailableNpaNxxList->AvailableNpaNxx as $result) {
             $city = $result->City;
             $state = $result->State;
             $npanxx = $result->Npa . $result->Nxx;
 
-            $url = $this->_settings->api_url . "accounts/" . $this->_settings->account_id . "/availableNumbers?&npaNxx=" . $npanxx;
+            // Get number list for this NpaNxx
+            $xml_number_result = $this->_get_available_numbers_by_npa_nxx($npanxx);
 
-            curl_setopt_array($this->_curl, array(
-                CURLOPT_URL => $url
-            ));
+            $this->_obj_number->start_transaction();
 
-            $xml_number_result = simplexml_load_string(curl_exec($this->_curl));
+            if (!$this->_obj_number->delete_like_number('1' . $npanxx))
+                $this->_obj_number->rollback();
 
             // Numbers array
             $arr_numbers = array();
             foreach ($xml_number_result->TelephoneNumberList->TelephoneNumber as $number) {
-                // Creating number model
-                $obj_number = new models_number("bandwidth");
-                $obj_number->set_number($number);
-                $obj_number->set_city($city);
-                $obj_number->set_state($state);
-                $obj_number->insert();
+                $this->_obj_number->set_number('1' . $number);
+                $this->_obj_number->set_city($city);
+                $this->_obj_number->set_state($state);
+                $this->_obj_number->insert();
 
                 // building the number array
-                $arr_numbers[] = (int)$number;
+                $arr_numbers[] = (int)'1' . $number;
             }
 
             // Sort from lowest to highest
             $arr_numbers = array_unique($arr_numbers, SORT_NUMERIC);
             sort($arr_numbers);
 
-            print_r($arr_numbers);
+            $this->_obj_block->start_transaction();
 
-            // Blocks
-            $cur_block = new models_block("bandwidth");
-            $cur_block->set_start_number($arr_numbers[0]);
-            $previous_number = null;
-            for ($i=0; $i < count($arr_numbers); $i++) { 
-                $current = (int)substr($arr_numbers[$i], -4);
-                $next = (int)substr($arr_numbers[$i+1], -4);
+            if (!$this->_obj_block->delete_like_number('1' . $npanxx))
+                $this->_obj_block->rollback();
 
-                echo "Entering loop\n";
-                $nplus1 = $arr_numbers[$i+1];
-                $n = $arr_numbers[$i];
-                echo "arr + 1 is: $nplus1\n";
-                echo "next is : $next\n";
+            $this->_insert_block($arr_numbers);
 
-                if($next) {
-                    echo "in next \n";
-                    if($next == $current + 1) {
-                        echo "inside group for $n\n";
-                        continue;
-                    } else {
-                        $cur_block->set_end_number($arr_numbers[$i]);
-                        if ($cur_block->insert()) {
-                            $cur_block = null;
-                            $cur_block = new models_block("bandwidth");
-                            $cur_block->set_start_number($arr_numbers[$i+1]);
-                        } else 
-                            exit('Could not save a block');
-                    }
-                } else {
-                    echo "not in next \n";
-                    $cur_block->set_end_number($arr_numbers[$i]);
-                    if ($cur_block->insert()) {
-                        continue;
-                    } else 
-                        exit('Could not save a block');
-                }
+            $this->_obj_number->commit();
+            $this->_obj_block->commit();
+
+            sleep($this->_settings->wait_timer);
+        }
+    }
+
+    public function create($area_code) {
+        if (!$area_code)
+            die("Empty area code\n");
+
+        // Creating models
+        $this->_obj_number = new models_number("bandwidth");
+        $this->_obj_block = new models_block("bandwidth");
+
+        $xml_result = $this->_get_available_npa_nxx($area_code);
+        foreach ($xml_result->AvailableNpaNxxList->AvailableNpaNxx as $result) {
+            $city = $result->City;
+            $state = $result->State;
+            $npanxx = $result->Npa . $result->Nxx;
+
+            $xml_number_result = $this->_get_available_numbers_by_npa_nxx($npanxx);
+
+            $this->_obj_number->set_or_create_db('US_' . $area_code);
+
+            // Numbers array
+            $arr_numbers = array();
+            foreach ($xml_number_result->TelephoneNumberList->TelephoneNumber as $number) {
+                $this->_obj_number->set_number('1' . $number);
+                $this->_obj_number->set_city($city);
+                $this->_obj_number->set_state($state);
+                $this->_obj_number->insert();
+
+                // building the number array
+                $arr_numbers[] = (int)'1' . $number;
             }
+
+            // Sort from lowest to highest
+            $arr_numbers = array_unique($arr_numbers, SORT_NUMERIC);
+            sort($arr_numbers);
+
+            $this->_insert_block($arr_numbers);
 
             sleep($this->_settings->wait_timer);
         }
