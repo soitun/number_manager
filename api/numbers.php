@@ -28,16 +28,24 @@ class Numbers {
         $limit = isset($request_data['limit']) ? $request_data['limit'] : null;
         $offset = isset($request_data['offset']) ? $request_data['offset'] : null;
 
-        $numbers = new models_number();
-        
-        if (is_numeric($pattern)){
-            $result = $numbers->search_by_area_code($pattern, $country, $limit, $offset);
+        if (!isset($request_data['contiguous'])) {
+            $numbers = new models_number();
+            if (is_numeric($pattern)){
+                $result = $numbers->search_by_area_code($pattern, $country, $limit, $offset);
+                if ($result)
+                    return array("data" => $result);
+                else
+                    return array("data" => array("status" => "error", "message" => "Nothing found"));
+            } else {
+                return "city";
+            }
+        } else { // We are then looking for a block
+            $block = new models_block();
+            $result = $block->get_blocks($pattern, $request_data['contiguous'], $country, $limit, $offset);
             if ($result)
                 return array("data" => $result);
             else
                 return array("data" => array("status" => "error", "message" => "Nothing found"));
-        } else {
-            return "city";
         }
     }
 
