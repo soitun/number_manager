@@ -16,7 +16,7 @@ abstract class models_model {
         $this->_provider = $provider;
 
         $general_settings = helper_settings::get_instance();
-        $this->_provider_settings = $general_settings->providers->$provider->bandwidth;
+        $this->_provider_settings = $general_settings->providers->{ENVIRONMENT}->$provider;
         $this->_database_settings = $general_settings->database;
 
         $this->_init_mysql();

@@ -12,6 +12,7 @@ class models_number extends models_model {
     private $_last_update;
     private $_city;
     private $_state;
+    private $_db_name;
 
     // === Setter ===
 
@@ -33,6 +34,32 @@ class models_number extends models_model {
 
     public function set_state($state) {
         $this->_state = $state;
+    }
+
+    public function set_or_create_db($db_name) {
+        $this->_db_name = $db_name;
+
+        try {
+            $query = "CREATE TABLE IF NOT EXISTS `" . $db_name . "` (
+              `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+              `number` bigint(20) unsigned NOT NULL,
+              `provider` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+              `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              `city` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+              `state` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+              PRIMARY KEY (`id`),
+              UNIQUE KEY `number` (`number`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;";
+
+            $stmt = $this->_db->prepare($query);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    public function set_db_name($db_name) {
+        $this->_db_name = $db_name;
     }
 
     // === Getter ===
@@ -67,13 +94,59 @@ class models_number extends models_model {
         parent::__destruct();
     }
 
+    public function start_transaction() {
+        echo "start_transaction \n";
+        $this->_db->beginTransaction();
+    }
+
+    public function commit() {
+        echo "commit \n";
+        $this->_db->commit();
+    }
+
+    public function rollback() {
+        echo "rollback \n";
+        $this->_db->rollBack();
+    }
+
+    public function get_by_number($pattern) {
+        $like = $pattern . '%';
+        $db_name = $country . '_' . $area_code;
+
+        if (!$limit && !$offset)
+            $query = "SELECT * FROM `" . $db_name . "` WHERE `number` LIKE ?";
+
+        $stmt = $this->_db->prepare($query);
+        $stmt->execute(array($like));
+
+        if ($stmt->rowCount())
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        else
+            return false;
+    }
+
     // Adding number in DB
     public function insert() {
         try {
-            $stmt = $this->_db->prepare("INSERT INTO `numbers`(`number`, `provider`, `cache_update`, `city`, `state`) VALUES(?, ?, now(), ?, ?)");
+            $stmt = $this->_db->prepare("INSERT INTO `" . $this->_db_name . "`(`number`, `provider`, `city`, `state`) VALUES(?, ?, ?, ?)");
             $stmt->execute(array($this->_number, $this->_provider, $this->_city, $this->_state));
         } catch (PDOException $e) {
-            return true;
+            echo $e->getMessage() . "\n";
+            return false;
+        }
+
+        return true;
+    }
+
+    public function delete_like_number($number) {
+        $like = $number . '%';
+
+        try {
+            $stmt = $this->_db->prepare("DELETE FROM `" . $this->_db_name . "` WHERE `number` LIKE ?");
+            $stmt->execute(array($like));
+        } catch (PDOException $e) {
+            echo $e->getMessage() . "\n";
+            return false;
         }
 
         return true;
