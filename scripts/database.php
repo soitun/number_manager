@@ -1,6 +1,6 @@
 <?php 
 
-class scripts_syncdb {
+class scripts_database {
     private $_file = null;
     private $_settings = null;
 
@@ -18,12 +18,21 @@ class scripts_syncdb {
         fclose($this->_file);
     }
 
-    public function sync() {
+    public function create() {
         // Bandwidth
         while (!feof($this->_file)) {
             $current_area_code = trim(fgets($this->_file));
             $objBandwidth = new providers_bandwidth_provider();
-            $objBandwidth->sync($current_area_code);
+            $objBandwidth->create($current_area_code);
+        }
+    }
+
+    public function update() {
+        // Bandwidth
+        while (!feof($this->_file)) {
+            $current_area_code = trim(fgets($this->_file));
+            $objBandwidth = new providers_bandwidth_provider();
+            $objBandwidth->update($current_area_code);
         }
     }
 }
