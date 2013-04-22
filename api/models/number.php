@@ -59,19 +59,20 @@ class models_numbers extends models_model{
 
     // ==============
 
-    function __construct() {
-        parent::__construct();
+    function __construct($provider) {
+        parent::__construct($provider);
     }
 
-    public function search_by_area_code($area_code, $limit = null, $offset = null) {
+    public function search_by_area_code($area_code, $country, $limit = null, $offset = null) {
         $like = $area_code . '%';
+        $db_name = $country . '_' . $area_code;
 
         if (!$limit && !$offset)
-            $query = "SELECT * FROM `numbers` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT 10";
+            $query = "SELECT * FROM `" . $db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT 10";
         elseif ($limit && $offset)
-            $query = "SELECT * FROM `numbers` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $offset . ", " . $limit;
+            $query = "SELECT * FROM `" . $db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $offset . ", " . $limit;
         elseif ($limit && !$offset)
-            $query = "SELECT * FROM `numbers` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $limit;
+            $query = "SELECT * FROM `" . $db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $limit;
         else
             return false;
 
