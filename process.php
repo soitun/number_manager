@@ -9,28 +9,67 @@
 
 require_once 'bootstrap.php';
 
+$command = $argv[1];
+
 // Just making sure that everything is where it should be
-if(!isset($argv[1]) || !isset($argv[2])) {
-    die("Usage: php process.php <command> <area_code_file_path>\n");
+if(!isset($command)) {
+    die("Usage: php process.php <database / utils> [<args>]\n");
 }
 
-$command = $argv[1];
-$farea_code = $argv[2];
-
-if(!file_exists($farea_code))
-    die("Could not find the file\n");
-
 switch ($command) {
-    case 'sync_db':
-        $sync_obj = new scripts_syncdb($farea_code);
-        $sync_obj->sync();
+    case 'database':
+        $arg = $argv[2];
+        $file = $argv[3];
+
+        if (!isset($arg))
+            die("Argument missing\n");
+
+        if (!file_exists($file))
+            die("Could not find the file\n");
+
+        $db_obj = new scripts_database($file);
+
+        switch ($arg) {
+            case 'create':
+                $db_obj->create();
+                break;
+                
+            case 'update':
+                $db_obj->update();
+                break;
+
+            default:
+                echo("ERROR: Wrong argument\n");
+                echo("Available args: sync / update\n");
+                break;
+        }
         break;
 
-    case 'sync_city':
-        $sync_obj = new scripts_synccity();
-        $sync_obj->sync();
+    case 'utils':
+        if (!isset($argv[2]))
+            die("Argument missing\n");
+
+        switch ($argv[2]) {
+            case 'list':
+                $list = scripts_utilsdb::get_table_list();
+                foreach ($list as $table) {
+                    echo $table . "\n";
+                }
+                break;
+
+            case 'truncate':
+                scripts_utilsdb::truncate($argv[3]);
+                break;
+            
+            default:
+                echo("ERROR: Wrong argument\n");
+                echo("Available args: list / truncate\n");
+                break;
+        }
+        break;
 
     default:
         echo("ERROR: Wrong command\n");
         echo("Available commands: sync_db / sync_city\n");
+        break;
 }
