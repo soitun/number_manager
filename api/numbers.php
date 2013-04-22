@@ -39,13 +39,15 @@ class Numbers {
             } else {
                 return "city";
             }
-        } else { // We are then looking for a block
+        } else if (isset($request_data['contiguous']) && $request_data['contiguous'] >= 1) { // We are then looking for a block
             $block = new models_block();
             $result = $block->get_blocks($pattern, $request_data['contiguous'], $country, $limit, $offset);
             if ($result)
                 return array("data" => $result);
             else
                 return array("data" => array("status" => "error", "message" => "Nothing found"));
+        } else {
+            return array("data" => array("status" => "error", "message" => "Bad request"));
         }
     }
 

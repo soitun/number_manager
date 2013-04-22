@@ -64,7 +64,7 @@ class models_numbers extends models_model{
     }
 
     public function search_by_area_code($area_code, $country, $limit = null, $offset = null) {
-        $like = $area_code . '%';
+        $like = '1' . $area_code . '%';
         $db_name = $country . '_' . $area_code;
 
         if (!$limit && !$offset)
