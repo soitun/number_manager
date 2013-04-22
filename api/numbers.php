@@ -28,22 +28,33 @@ class Numbers {
         $limit = isset($request_data['limit']) ? $request_data['limit'] : null;
         $offset = isset($request_data['offset']) ? $request_data['offset'] : null;
 
-        if (!isset($request_data['contiguous'])) {
-            $numbers = new models_number();
-            if (is_numeric($pattern)){
-                $result = $numbers->search_by_area_code($pattern, $country, $limit, $offset);
-                if ($result)
-                    return array("data" => $result);
-                else
-                    return array("data" => array("status" => "error", "message" => "Nothing found"));
-            } else {
-                return "city";
-            }
-        } else if (isset($request_data['contiguous']) && $request_data['contiguous'] >= 1) { // We are then looking for a block
-            $block = new models_block();
-            $result = $block->get_blocks($pattern, $request_data['contiguous'], $country, $limit, $offset);
+        $numbers = new models_number();
+        if (is_numeric($pattern)){
+            $result = $numbers->search_by_area_code($pattern, $country, $limit, $offset);
             if ($result)
-                return array("data" => $result);
+                return array("data" => array("status" => "success", "result" => $result));
+            else
+                return array("data" => array("status" => "error", "message" => "Nothing found"));
+        } else {
+            return "city";
+        }
+    }
+
+    /**
+     * Do a block research
+     *
+     * @url GET /{country}/get_block
+     */
+    function get_block($request_data, $country) {
+        $pattern = $request_data['pattern'];
+        $limit = isset($request_data['limit']) ? $request_data['limit'] : null;
+        $offset = isset($request_data['offset']) ? $request_data['offset'] : null;
+
+        if (isset($request_data['size']) && $request_data['size'] >= 1) {
+            $block = new models_block();
+            $result = $block->get_blocks($pattern, $request_data['size'], $country, $limit, $offset);
+            if ($result)
+                return array("data" => array("status" => "success", "result" => $result));
             else
                 return array("data" => array("status" => "error", "message" => "Nothing found"));
         } else {
@@ -64,7 +75,7 @@ class Numbers {
         $result = $number->search_by_number($request_data['number']);
 
         if ($result) {
-            return array("data" => array("status" => "success", "message" => "Number available"));
+            return array("data" => array("status" => "success", "result" => "Number available"));
         } else {
             return array("data" => array("status" => "error", "message" => "Number not available"));
         }
