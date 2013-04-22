@@ -86,7 +86,9 @@ class models_numbers extends models_model{
     }
 
     public function search_by_number($number) {
-        $stmt = $this->_db->prepare("SELECT * FROM `numbers` WHERE `number`=?");
+        // This is not good. Hard coded here!
+        $db_name =  'US_' . substr($number, 1, 3);
+        $stmt = $this->_db->prepare("SELECT * FROM `" . $db_name . "` WHERE `number`=?");
         $stmt->execute(array($number));
 
         if ($stmt->rowCount())

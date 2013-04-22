@@ -21,9 +21,9 @@ class Numbers {
     /**
      * Do a research by area code, npanxx or city
      *
-     * @url GET /search
+     * @url GET /{country}/search
      */
-    function search($request_data) {
+    function search($request_data, $country) {
         $pattern = $request_data['pattern'];
         $limit = isset($request_data['limit']) ? $request_data['limit'] : null;
         $offset = isset($request_data['offset']) ? $request_data['offset'] : null;
@@ -31,7 +31,7 @@ class Numbers {
         $numbers = new models_number();
         
         if (is_numeric($pattern)){
-            $result = $numbers->search_by_area_code($pattern, $limit, $offset);
+            $result = $numbers->search_by_area_code($pattern, $country, $limit, $offset);
             if ($result)
                 return array("data" => $result);
             else
@@ -44,9 +44,9 @@ class Numbers {
     /**
      * This will allow the user to get the default settings for an account and for a phone 
      *
-     * @url GET /status
+     * @url GET /{country}/status
      */
-    function status($request_data) {
+    function status($request_data, $country) {
         if (!isset($request_data['number']))
             throw new RestException(400, "This request need a 'number' parameter");
 
