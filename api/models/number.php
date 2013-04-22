@@ -59,8 +59,8 @@ class models_numbers extends models_model{
 
     // ==============
 
-    function __construct($provider) {
-        parent::__construct($provider);
+    function __construct() {
+        parent::__construct();
     }
 
     public function search_by_area_code($area_code, $country, $limit = null, $offset = null) {
