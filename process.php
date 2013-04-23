@@ -69,6 +69,7 @@ switch ($command) {
                 $vanity = $argv[7];
                 $prefix = $argv[8];
                 scripts_utilsdb::add_country($name, $iso_code, $local, $toll_free, $vanity, $prefix);
+                break;
             
             default:
                 echo("ERROR: Wrong argument\n");
