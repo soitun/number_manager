@@ -27,8 +27,16 @@ class Utilities {
         $country_obj = new models_country();
         $country_list = $country_obj->get_countries();
 
+        $result = array();
+        foreach ($country_list as $row) {
+            $row['local'] = (bool)$row['local'];
+            $row['vanity'] = (bool)$row['vanity'];
+
+            array_push($result, $row);
+        }
+        
         if($country_list) {
-            return array("status" => "success", "data" => $country_list);
+            return array("status" => "success", "data" => $result);
         } else {
             return array("status" => "error", "data" => array());
         }
