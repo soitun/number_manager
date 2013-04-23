@@ -60,6 +60,15 @@ switch ($command) {
             case 'truncate':
                 scripts_utilsdb::truncate($argv[3]);
                 break;
+
+            case 'add_country':
+                $name = $argv[3];
+                $iso_code = $argv[4];
+                $local = $argv[5];
+                $toll_free = $argv[6];
+                $vanity = $argv[7];
+                $prefix = $argv[8];
+                scripts_utilsdb::add_country($name, $iso_code, $local, $toll_free, $vanity, $prefix);
             
             default:
                 echo("ERROR: Wrong argument\n");
