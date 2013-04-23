@@ -24,7 +24,6 @@ header('Access-Control-Max-Age:86400');
 $r = new Restler();
 $r->setSupportedFormats('JsonFormat');
 $r->addAPIClass('numbers');
-$r->addAPIClass('blocks');
 //$r->addAuthenticationClass('AccessControl');
 $r->handle();
 

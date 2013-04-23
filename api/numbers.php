@@ -30,32 +30,36 @@ class Numbers {
 
         $numbers = new models_number();
         if (is_numeric($pattern)){
-            $result = $numbers->search_by_area_code($pattern, $country, $limit, $offset);
+            $result = $numbers->search_by_($pattern, $country, $limit, $offset);
             if ($result)
-                return array("data" => array("status" => "success", "result" => $result));
+                return array("status" => "success", "data" => array($result));
             else
-                return array("data" => array("status" => "error", "message" => "Nothing found"));
+                return array("status" => "error", "data" => array("message" => "Nothing found"));
         } else {
             return "city";
         }
     }
 
     /**
-     * This will allow the user to get the default settings for an account and for a phone 
+     * Do a block research
      *
-     * @url GET /{country}/status
+     * @url GET /{country}/block_search
      */
-    function status($request_data, $country) {
-        if (!isset($request_data['number']))
-            throw new RestException(400, "This request need a 'number' parameter");
+    function search($request_data, $country) {
+        $pattern = $request_data['pattern'];
+        $size = $request_data['size'];
+        $limit = isset($request_data['limit']) ? $request_data['limit'] : null;
+        $offset = isset($request_data['offset']) ? $request_data['offset'] : null;
 
-        $number = new models_number();
-        $result = $number->search_by_number($request_data['number']);
-
-        if ($result) {
-            return array("data" => array("status" => "success", "result" => "Number available"));
+        if ($size) {
+            $block = new models_block();
+            $result = $block->get_blocks($pattern, $size, $country, $limit, $offset);
+            if ($result)
+                return array("status" => "success", "data" => array($result));
+            else
+                return array("status" => "error", "data" => array("message" => "Nothing found"));
         } else {
-            return array("data" => array("status" => "error", "message" => "Number not available"));
+            return array("status" => "error", "data" => array("message" => "Bad request"));
         }
     }
 }
