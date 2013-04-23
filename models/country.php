@@ -51,27 +51,27 @@ class models_country extends models_model {
         return $this->_iso_code;
     }
 
-    public function set_local() {
+    public function get_local() {
         return $this->_local;
     }
 
-    public function set_toll_free() {
+    public function get_toll_free() {
         return $this->_toll_free;
     }
 
-    public function set_vanity() {
+    public function get_vanity() {
         return $this->_vanity;
     }
 
-    public function set_prefix() {
+    public function get_prefix() {
         return $this->_prefix;
     }
 
-    public function set_flag_url() {
+    public function get_flag_url() {
         return $this->_flag_url;
     }
 
-    public function set_name() {
+    public function get_name() {
         return $this->_name;
     }
 
@@ -83,6 +83,26 @@ class models_country extends models_model {
 
     function __destruct() {
         parent::__destruct();
+    }
+
+    public function insert() {
+        try {
+            $stmt = $this->_db->prepare("INSERT INTO `countries` (`iso_code`, `local`, `toll_free`, `vanity`, `prefix`, `flag_url`, `name`) VALUES(?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute(array(
+                $this->_iso_code, 
+                $this->_local, 
+                $this->_toll_free, 
+                $this->_vanity,
+                $this->_prefix,
+                $this->_flag_url,
+                $this->_name
+            ));
+        } catch (PDOException $e) {
+            echo $e->getMessage() . "\n";
+            return false;
+        }
+
+        return true;
     }
 }
 
