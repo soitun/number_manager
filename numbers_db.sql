@@ -33,17 +33,18 @@ CREATE TABLE `blocks` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `numbers`
+-- Table structure for table `countries`
 --
 
-CREATE TABLE `numbers` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `number` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `provider` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `cache_update` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `city` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `state` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+CREATE TABLE `countries` (
+  `id` int(4) unsigned NOT NULL AUTO_INCREMENT,
+  `iso_code` varchar(2) COLLATE utf8_unicode_ci NOT NULL,
+  `local` tinyint(4) NOT NULL DEFAULT '0',
+  `toll_free` tinyint(4) NOT NULL DEFAULT '0',
+  `vanity` tinyint(4) NOT NULL DEFAULT '0',
+  `prefix` int(5) unsigned NOT NULL,
+  `flag_url` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `name` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `number` (`number`)
+  UNIQUE KEY `iso_code` (`iso_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
