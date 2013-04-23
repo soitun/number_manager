@@ -1,5 +1,6 @@
 {
     "version": "1.0",
+    "flags_url": "",
 
     "database": {
         "database_host": "localhost",
