@@ -42,6 +42,21 @@ class scripts_utilsdb {
             }
         }
     }
+
+    public static function add_country($name, $iso_code, $local, $toll_free, $vanity, $prefix) {
+        $db = scripts_utilsdb::_get_db_instance();
+        $settings = helper_settings::get_instance();
+
+        $country = new models_country();
+        $country->set_iso_code($iso_code);
+        $country->set_local($local);
+        $country->set_toll_free($toll_free);
+        $country->set_vanity($vanity);
+        $country->set_prefix($prefix);
+        $country->set_name($name);
+        $country->set_flag_url($settings->flags_url . strtoupper($iso_code) . ".png");
+        $country->insert();
+    }
 }
 
  ?>

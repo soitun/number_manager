@@ -13,52 +13,6 @@ class models_numbers extends models_model{
     private $_city;
     private $_state;
 
-    // === Setter ===
-
-    public function set_number($number) {
-        $this->_number = $number;
-    }
-
-    public function set_cache_date($cache_date) {
-        $this->_cache_date = $cache_date;
-    }
-
-    public function set_last_update($last_update) {
-        $this->_last_update = $last_update;
-    }
-
-    public function set_city($city) {
-        $this->_city = $city;
-    }
-
-    public function set_state($state) {
-        $this->_state = $state;
-    }
-
-    // === Getter ===
-
-    public function get_number($number) {
-        return $this->_number;
-    }
-
-    public function get_cache_date($cache_date) {
-        return $this->_cache_date;
-    }
-
-    public function get_last_update($last_update) {
-        return $this->_last_update;
-    }
-
-    public function get_city($city) {
-        return $this->_city;
-    }
-
-    public function get_state($state) {
-        return $this->_state;
-    }
-
-    // ==============
-
     function __construct() {
         parent::__construct();
     }
