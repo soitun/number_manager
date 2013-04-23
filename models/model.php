@@ -12,11 +12,12 @@ abstract class models_model {
     protected $_provider_settings;
     protected $_database_settings;
 
-    function __construct($provider) {
+    function __construct($provider = null) {
         $this->_provider = $provider;
 
         $general_settings = helper_settings::get_instance();
-        $this->_provider_settings = $general_settings->providers->{ENVIRONMENT}->$provider;
+        if ($this->_provider)
+            $this->_provider_settings = $general_settings->providers->{ENVIRONMENT}->$provider;
         $this->_database_settings = $general_settings->database;
 
         $this->_init_mysql();
