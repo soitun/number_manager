@@ -45,7 +45,7 @@ class Numbers {
      *
      * @url GET /{country}/block_search
      */
-    function search($request_data, $country) {
+    function block_search($request_data, $country) {
         $pattern = $request_data['pattern'];
         $size = $request_data['size'];
         $limit = isset($request_data['limit']) ? $request_data['limit'] : null;
