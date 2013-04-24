@@ -3,18 +3,38 @@
 /**
  * Number model
  * @author Francis Genet
- * @package Number_manager
+ * @package Number_manager_api
  */
 class models_numbers extends models_model{
     private $_id;
     private $_number;
-    private $_cache_date;
     private $_last_update;
     private $_city;
     private $_state;
 
-    function __construct() {
+    // $number must be like 
+    function __construct($number = null, $country = null) {
         parent::__construct();
+
+        if ($number && $country) {
+            // Too static
+            $db_name = $country . '_' . substr($number, 1, 3);
+            $query = "SELECT * FROM `" . . "` WHERE `number` = ?";
+            $stmt = $this->_db->prepare($query);
+            $stmt->execute(array($number));
+
+            if ($stmt->rowCount()) {
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $this->_id = $result['id'];
+                $this->_number = $result['number'];
+                $this->_last_update = $result['last_update'];
+                $this->_city = $result['city'];
+                $this->_state = $result['state'];
+
+                return true;
+            } else 
+                return false;
+        }
     }
 
     public function search_by_number($area_code, $country, $limit = null, $offset = null) {

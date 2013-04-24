@@ -3,7 +3,7 @@
 /**
  * Basic model
  * @author Francis Genet
- * @package Number_manager
+ * @package Number_manager_api
  */
 class models_model {
     // Class attribute
