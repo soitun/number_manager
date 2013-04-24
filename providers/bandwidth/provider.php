@@ -7,14 +7,12 @@ class providers_bandwidth_provider implements providers_iprovider {
     private $_obj_block;
 
     function __construct() {
-        echo "Constructor \n";
         $general_settings = helper_settings::get_instance();
         $this->_settings = $general_settings->providers->{ENVIRONMENT}->bandwidth;
         $this->_init_curl();
     }
 
     function __destruct() {
-        echo "Destructor \n";
         curl_close($this->_curl);
         $this->_db = null;
     }
@@ -29,7 +27,7 @@ class providers_bandwidth_provider implements providers_iprovider {
             CURLOPT_HTTPHEADER => array('Content-Type: application/xml'),
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_CAINFO => ROOT_PATH . "/certs/apitest.crt",
+            CURLOPT_CAINFO => CERTS_PATH . "apitest.crt",
             CURLOPT_USERPWD => $this->_settings->username . ":" . $this->_settings->password
         ));
     }
@@ -42,12 +40,8 @@ class providers_bandwidth_provider implements providers_iprovider {
             $current = (int)substr($arr_numbers[$i], -4);
             $next = (int)substr($arr_numbers[$i+1], -4);
 
-            echo 'Currently on: ' . $arr_numbers[$i] . "\n";
-
             if($next) {
-                echo "in next \n";
                 if($next == $current + 1) {
-                    echo "inside group for $n\n";
                     continue;
                 } else {
                     $this->_obj_block->set_end_number($arr_numbers[$i]);
