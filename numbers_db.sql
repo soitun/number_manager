@@ -40,7 +40,7 @@ CREATE TABLE `countries` (
   `id` int(4) unsigned NOT NULL AUTO_INCREMENT,
   `iso_code` varchar(2) COLLATE utf8_unicode_ci NOT NULL,
   `local` tinyint(4) NOT NULL DEFAULT '0',
-  `toll_free` tinyint(4) NOT NULL DEFAULT '0',
+  `toll_free` varchar(255) NULL,
   `vanity` tinyint(4) NOT NULL DEFAULT '0',
   `prefix` int(5) unsigned NOT NULL,
   `flag_url` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
