@@ -1,0 +1,37 @@
+{
+    "version": "1.0",
+
+    "database": {
+        "database_host": "localhost",
+        "database_name": "numbers_db",
+        "database_charset": "utf8",
+        "database_user": "root",
+        "database_password": "root"
+    },
+
+    "providers": {
+        "dev": {
+            "bandwidth": {
+                "account_id": "",
+                "api_url": "",
+                "site_id": "",
+                "peer_id": "",
+                "username": "",
+                "password": "!",
+                "wait_timer": "0"
+            }
+        },
+
+        "prod": {
+            "bandwidth": {
+                "account_id": "",
+                "api_url": "",
+                "site_id": "",
+                "peer_id": "",
+                "username": "",
+                "password": "",
+                "wait_timer": "2"
+            }
+        }
+    }
+}
