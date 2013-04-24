@@ -30,9 +30,9 @@ class Numbers {
 
         $numbers = new models_number();
         if (is_numeric($pattern)){
-            $result = $numbers->search_by_($pattern, $country, $limit, $offset);
+            $result = $numbers->search_by_number($pattern, $country, $limit, $offset);
             if ($result)
-                return array("status" => "success", "data" => array($result));
+                return array("status" => "success", "data" => $result);
             else
                 return array("status" => "error", "data" => array("message" => "Nothing found"));
         } else {
