@@ -31,7 +31,16 @@ class Utilities {
         foreach ($country_list as $row) {
             $row['local'] = (bool)$row['local'];
             $row['vanity'] = (bool)$row['vanity'];
-            $row['toll_free'] = explode(' ', $row['toll_free']);
+            $explode_toll_free = explode(' ', $row['toll_free']);
+
+            $toll_free = array();
+            foreach ($explode_toll_free as $key) {
+                $key = (int)$key;
+                array_push($toll_free, $key);
+            }
+
+            $row['toll_free'] = $toll_free;
+            $row['prefix'] = (int)$row['prefix'];
 
             array_push($result, $row);
         }
