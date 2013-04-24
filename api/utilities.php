@@ -34,6 +34,7 @@ class Utilities {
             $explode_toll_free = explode(' ', $row['toll_free']);
 
             $toll_free = array();
+            // Casting to int (it is a string from the DB)
             foreach ($explode_toll_free as $key) {
                 $key = (int)$key;
                 array_push($toll_free, $key);
