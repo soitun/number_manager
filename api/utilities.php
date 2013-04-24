@@ -31,10 +31,11 @@ class Utilities {
         foreach ($country_list as $row) {
             $row['local'] = (bool)$row['local'];
             $row['vanity'] = (bool)$row['vanity'];
+            $row['toll_free'] = explode(' ', $row['toll_free']);
 
             array_push($result, $row);
         }
-        
+
         if($country_list) {
             return array("status" => "success", "data" => $result);
         } else {
