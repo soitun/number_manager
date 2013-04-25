@@ -18,19 +18,20 @@ class models_numbers extends models_model{
         parent::__construct();
 
         if ($number && $country) {
-            // Too static
-            $this->_db_name = $country . '_' . substr($number, 1, 3);
+            $country_obj = new models_country($country);
+
+            $this->_db_name = $country . '_' . substr($number, strlen($country_obj->get_prefix()), 3);
             $query = "SELECT * FROM `" . $this->_db_name . "` WHERE `number` = ?";
             $stmt = $this->_db->prepare($query);
             $stmt->execute(array($number));
 
             if ($stmt->rowCount()) {
                 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                $this->_id = $result['id'];
-                $this->_number = $result['number'];
-                $this->_last_update = $result['last_update'];
-                $this->_city = $result['city'];
-                $this->_state = $result['state'];
+                $this->_id = $result[0]['id'];
+                $this->_number = $result[0]['number'];
+                $this->_last_update = $result[0]['last_update'];
+                $this->_city = $result[0]['city'];
+                $this->_state = $result[0]['state'];
 
                 return true;
             } else 
@@ -60,11 +61,15 @@ class models_numbers extends models_model{
             return false;
     }
 
-    public function delete() {
-        if ($this->_id) {
-            $query = "DELETE FROM `" . $this->_db_name . "` WHERE `id` = ?";
-            $stmt = $this->_db->prepare($query);
-            $stmt->execute(array($this->_id));
+    public function delete($number = null) {
+        if (!$number) {
+            if ($this->_id) {
+                $query = "DELETE FROM `" . $this->_db_name . "` WHERE `id` = ?";
+                $stmt = $this->_db->prepare($query);
+                $stmt->execute(array($this->_id));
+            }
+        } else {
+            // TBI
         }
     }
 }
