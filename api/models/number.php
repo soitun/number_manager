@@ -39,9 +39,9 @@ class models_numbers extends models_model{
         }
     }
 
-    public function search_by_number($area_code, $country, $limit = null, $offset = null) {
-        $like = '1' . $area_code . '%';
-        $db_name = $country . '_' . $area_code;
+    public function search_by_number($pattern, $country, $limit = null, $offset = null) {
+        $like = '1' . $pattern . '%';
+        $db_name = $country . '_' . substr($pattern, 0, 3);
 
         if ($limit > 100)
             $limit = 100;
