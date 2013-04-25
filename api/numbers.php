@@ -62,6 +62,20 @@ class Numbers {
             return array("status" => "error", "data" => array("message" => "Bad request"));
         }
     }
+
+    /**
+     * Make a number(s) order
+     *
+     * @url GET /{country}/order
+     */
+    function order($request_data, $country) {
+        $bandwidth = new models_bandwidth();
+        //print_r($bandwidth->get_site_list());
+        //print_r($bandwidth->get_peer_list());
+        //print_r($bandwidth->create_peer("2600hz", "2600hz SIP peer", "184.106.157.174"));
+        //print_r($bandwidth->order(array("9193752369", "9193752720")));
+        //return $bandwidth->order_status("738adbaa-0032-4a04-a296-51fa9374717b");
+    }
 }
 
  ?>

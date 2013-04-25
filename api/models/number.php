@@ -11,6 +11,7 @@ class models_numbers extends models_model{
     private $_last_update;
     private $_city;
     private $_state;
+    private $_db_name;
 
     // $number must be like 
     function __construct($number = null, $country = null) {
@@ -18,8 +19,8 @@ class models_numbers extends models_model{
 
         if ($number && $country) {
             // Too static
-            $db_name = $country . '_' . substr($number, 1, 3);
-            $query = "SELECT * FROM `" . . "` WHERE `number` = ?";
+            $this->_db_name = $country . '_' . substr($number, 1, 3);
+            $query = "SELECT * FROM `" . $this->_db_name . "` WHERE `number` = ?";
             $stmt = $this->_db->prepare($query);
             $stmt->execute(array($number));
 
@@ -57,6 +58,14 @@ class models_numbers extends models_model{
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         else
             return false;
+    }
+
+    public function delete() {
+        if ($this->_id) {
+            $query = "DELETE FROM `" . $this->_db_name . "` WHERE `id` = ?";
+            $stmt = $this->_db->prepare($query);
+            $stmt->execute(array($this->_id));
+        }
     }
 }
 
