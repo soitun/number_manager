@@ -55,7 +55,7 @@ class Numbers {
             $block = new models_block();
             $result = $block->get_blocks($pattern, $size, $country, $limit, $offset);
             if ($result)
-                return array("status" => "success", "data" => array($result));
+                return array("status" => "success", "data" => $result);
             else
                 return array("status" => "error", "data" => array("message" => "Nothing found"));
         } else {
@@ -66,10 +66,23 @@ class Numbers {
     /**
      * Make a number(s) order
      *
-     * @url GET /{country}/order
+     * @url PUT /{country}/order
      */
     function order($request_data, $country) {
         $bandwidth = new models_bandwidth();
+
+        $country = new models_country($country);
+        $country->get_prefix();
+
+        // The numbers should be ordered first.
+        if (!$bandwidth->order($request_data['data']))
+            return array("status" => "error", "data" => array("message" => "Ay least one number was not available anymore"));
+
+        // This will delete the numbers.
+        foreach ($request_data['data'] as $number) {
+            $number_obj = new models_number($country->get_prefix() . $number, $country);
+            $number_obj->delete();
+        }
         //print_r($bandwidth->get_site_list());
         //print_r($bandwidth->get_peer_list());
         //print_r($bandwidth->create_peer("2600hz", "2600hz SIP peer", "184.106.157.174"));
