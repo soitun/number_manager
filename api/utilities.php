@@ -43,7 +43,8 @@ class Utilities {
             $row['toll_free'] = $toll_free;
             $row['prefix'] = (int)$row['prefix'];
 
-            array_push($result, $row);
+            $result[$row['iso_code']] = $row;
+            unset($result[$row['iso_code']]['iso_code']);
         }
 
         if($country_list) {
