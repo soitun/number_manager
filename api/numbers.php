@@ -70,9 +70,7 @@ class Numbers {
      */
     function order($request_data, $country) {
         $bandwidth = new models_bandwidth();
-
-        $country = new models_country($country);
-        $country->get_prefix();
+        $country_obj = new models_country($country);
 
         // The numbers should be ordered first.
         if (!$bandwidth->order($request_data['data']))
@@ -80,14 +78,9 @@ class Numbers {
 
         // This will delete the numbers.
         foreach ($request_data['data'] as $number) {
-            $number_obj = new models_number($country->get_prefix() . $number, $country);
+            $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
             $number_obj->delete();
         }
-        //print_r($bandwidth->get_site_list());
-        //print_r($bandwidth->get_peer_list());
-        //print_r($bandwidth->create_peer("2600hz", "2600hz SIP peer", "184.106.157.174"));
-        //print_r($bandwidth->order(array("9193752369", "9193752720")));
-        //return $bandwidth->order_status("738adbaa-0032-4a04-a296-51fa9374717b");
     }
 }
 
