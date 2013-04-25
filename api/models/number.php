@@ -43,6 +43,9 @@ class models_numbers extends models_model{
         $like = '1' . $area_code . '%';
         $db_name = $country . '_' . $area_code;
 
+        if ($limit > 100)
+            $limit = 100;
+
         if (!$limit && !$offset)
             $query = "SELECT `number`, `last_update`, `city`, `state` FROM `" . $db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT 10";
         elseif ($limit && $offset)
