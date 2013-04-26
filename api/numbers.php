@@ -82,6 +82,41 @@ class Numbers {
             $number_obj->delete();
         }
     }
+
+    /**
+     * Check number(s) status
+     *
+     * @url GET /{country}/status
+     */
+    function status($request_data, $country) {
+        $country_obj = new models_country($country);
+        $result = array();
+
+        foreach ($request_data['data'] as $number) {
+            $pref_number = $country_obj->get_prefix() . $number;
+            $tmp = array("number" => $number);
+
+            $number_obj = new models_number($pref_number, $country);
+            if($number_obj->exist()) {
+                $tmp['status'] = "success";
+            } else {
+                $tmp['status'] = "error";
+            }
+
+            array_push($result, $tmp);
+        }
+
+        return array("status" => "success", "data" => $result);
+    }
+
+    /**
+     * Check number(s) status
+     *
+     * @url GET /{country}/block_status
+     */
+    function block_status($request_data, $country) {
+        
+    }
 }
 
  ?>

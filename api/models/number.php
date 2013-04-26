@@ -12,10 +12,12 @@ class models_numbers extends models_model{
     private $_city;
     private $_state;
     private $_db_name;
+    private $_exist;
 
     // $number must be like 
     function __construct($number = null, $country = null) {
         parent::__construct();
+        $this->_exist = false;
 
         if ($number && $country) {
             $country_obj = new models_country($country);
@@ -32,11 +34,11 @@ class models_numbers extends models_model{
                 $this->_last_update = $result[0]['last_update'];
                 $this->_city = $result[0]['city'];
                 $this->_state = $result[0]['state'];
+                $this->_exist = true;
 
                 return true;
-            } else 
-                return false;
-        }
+            } else return false;
+        } else return false;
     }
 
     public function search_by_number($pattern, $country, $limit = null, $offset = null) {
@@ -64,6 +66,10 @@ class models_numbers extends models_model{
             return false;
     }
 
+    public function exist() {
+        return $this->_exist;
+    }
+
     public function delete($number = null) {
         if (!$number) {
             if ($this->_id) {
@@ -75,6 +81,8 @@ class models_numbers extends models_model{
             // TBI
         }
     }
+
+
 }
 
  ?>
