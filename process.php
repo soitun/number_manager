@@ -33,6 +33,10 @@ switch ($command) {
             case 'create':
                 $db_obj->create();
                 break;
+
+            case 'create_tollfree':
+                $db_obj->create_tollfree();
+                break;
                 
             case 'update':
                 $db_obj->update();

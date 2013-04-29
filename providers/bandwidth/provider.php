@@ -5,6 +5,7 @@ class providers_bandwidth_provider implements providers_iprovider {
     private $_settings;
     private $_obj_number;
     private $_obj_block;
+    private $_obj_tollfree;
 
     function __construct() {
         $general_settings = helper_settings::get_instance();
@@ -50,8 +51,7 @@ class providers_bandwidth_provider implements providers_iprovider {
                     } else 
                         exit('Could not save a block');
                 }
-            } else {
-                echo "not in next \n";
+
                 $this->_obj_block->set_end_number($arr_numbers[$i]);
                 if ($this->_obj_block->insert()) {
                     continue;
@@ -176,6 +176,32 @@ class providers_bandwidth_provider implements providers_iprovider {
             $this->_insert_block($arr_numbers);
 
             sleep($this->_settings->wait_timer);
+        }
+    }
+
+    private function _get_tollfree_numbers($area_code) {
+        $target = substr($area_code, 0, 2) . '*';
+        $url = $this->_settings->api_url . "accounts/" . $this->_settings->account_id . "/availableNumbers?&tollFreeWildCardPattern=" . $target;
+
+        curl_setopt_array($this->_curl, array(
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_URL => $url,
+            CURLOPT_POSTFIELDS => null
+        ));
+
+        return simplexml_load_string(curl_exec($this->_curl));
+    }
+
+    public function create_tollfree($area_code) {
+        if (!$area_code)
+            die("Empty area code\n");
+
+        $this->_obj_tollfree = new models_tollfree("bandwidth");
+
+        $xml_result = $this->_get_tollfree_numbers($area_code);
+        foreach ($xml_result->TelephoneNumberList->TelephoneNumber as $number) {
+            $this->_obj_tollfree->set_number('1' . $number);
+            $this->_obj_tollfree->insert();
         }
     }
 }

@@ -27,12 +27,30 @@ class scripts_database {
         }
     }
 
+    public function create_tollfree() {
+        // Bandwidth
+        while (!feof($this->_file)) {
+            $current_area_code = trim(fgets($this->_file));
+            $objBandwidth = new providers_bandwidth_provider();
+            $objBandwidth->create_tollfree($current_area_code);
+        }
+    }
+
     public function update() {
         // Bandwidth
         while (!feof($this->_file)) {
             $current_area_code = trim(fgets($this->_file));
             $objBandwidth = new providers_bandwidth_provider();
             $objBandwidth->update($current_area_code);
+        }
+    }
+
+    public function update_tollfree() {
+        // Bandwidth
+        while (!feof($this->_file)) {
+            $current_area_code = trim(fgets($this->_file));
+            $objBandwidth = new providers_bandwidth_provider();
+            $objBandwidth->update_tollfree($current_area_code);
         }
     }
 }
