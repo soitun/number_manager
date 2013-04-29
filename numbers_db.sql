@@ -48,3 +48,18 @@ CREATE TABLE `countries` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `iso_code` (`iso_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `toll_free`
+--
+
+CREATE TABLE IF NOT EXISTS `toll_free` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `number` bigint(20) unsigned NOT NULL,
+  `provider` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `number` (`number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
