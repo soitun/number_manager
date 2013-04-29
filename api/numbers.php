@@ -41,6 +41,24 @@ class Numbers {
     }
 
     /**
+     * Do a research by area code, npanxx or city
+     *
+     * @url GET /{country}/search_tollfree
+     */
+    function search_tollfree($request_data, $country) {
+        $pattern = $request_data['pattern'];
+        $limit = isset($request_data['limit']) ? $request_data['limit'] : null;
+        $offset = isset($request_data['offset']) ? $request_data['offset'] : null;
+
+        $numbers = new models_tollfree();
+        $result = $numbers->search_by_number($pattern, $country, $limit, $offset);
+        if ($result)
+            return array("status" => "success", "data" => $result);
+        else
+            return array("status" => "error", "data" => array("message" => "Nothing found"));
+    }
+
+    /**
      * Do a block research
      *
      * @url GET /{country}/block_search
@@ -112,10 +130,14 @@ class Numbers {
     /**
      * Check number(s) status
      *
-     * @url GET /{country}/block_status
+     * @url PUT /{country}/block_status
      */
     function block_status($request_data, $country) {
-        
+        $bandwidth = new models_bandwidth();
+
+        foreach ($request_data['data'] as $number) {
+            return $bandwidth->get_number_status($number);
+        }
     }
 }
 
