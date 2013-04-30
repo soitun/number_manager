@@ -149,6 +149,8 @@ class providers_bandwidth_provider implements providers_iprovider {
 
         $xml_result = $this->_get_available_npa_nxx($area_code);
         foreach ($xml_result->AvailableNpaNxxList->AvailableNpaNxx as $result) {
+            $this->_obj_number->start_transaction();
+
             $city = $result->City;
             $state = $result->State;
             $npanxx = $result->Npa . $result->Nxx;
@@ -173,8 +175,11 @@ class providers_bandwidth_provider implements providers_iprovider {
             $arr_numbers = array_unique($arr_numbers, SORT_NUMERIC);
             sort($arr_numbers);
 
+            $this->_obj_block->start_transaction();
             $this->_insert_block($arr_numbers);
 
+            $this->_obj_number->commit();
+            $this->_obj_block->commit();
             sleep($this->_settings->wait_timer);
         }
     }

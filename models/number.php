@@ -36,7 +36,7 @@ class models_number extends models_model {
         $this->_state = $state;
     }
 
-    public function set_or_create_db($db_name) {
+    public function create_db($db_name) {
         $this->_db_name = $db_name;
 
         try {
@@ -95,34 +95,15 @@ class models_number extends models_model {
     }
 
     public function start_transaction() {
-        echo "start_transaction \n";
         $this->_db->beginTransaction();
     }
 
     public function commit() {
-        echo "commit \n";
         $this->_db->commit();
     }
 
     public function rollback() {
-        echo "rollback \n";
         $this->_db->rollBack();
-    }
-
-    public function get_by_number($pattern) {
-        $like = $pattern . '%';
-        $db_name = $country . '_' . $area_code;
-
-        if (!$limit && !$offset)
-            $query = "SELECT * FROM `" . $db_name . "` WHERE `number` LIKE ?";
-
-        $stmt = $this->_db->prepare($query);
-        $stmt->execute(array($like));
-
-        if ($stmt->rowCount())
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        else
-            return false;
     }
 
     // Adding number in DB
