@@ -197,12 +197,15 @@ class providers_bandwidth_provider implements providers_iprovider {
             die("Empty area code\n");
 
         $this->_obj_tollfree = new models_tollfree("bandwidth");
+        $this->_obj_tollfree->start_transaction();
 
         $xml_result = $this->_get_tollfree_numbers($area_code);
         foreach ($xml_result->TelephoneNumberList->TelephoneNumber as $number) {
             $this->_obj_tollfree->set_number('1' . $number);
             $this->_obj_tollfree->insert();
         }
+
+        $this->_obj_tollfree->commit();
     }
 }
 
