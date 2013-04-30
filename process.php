@@ -9,6 +9,8 @@
 
 require_once 'bootstrap.php';
 
+$time_start = microtime(true);
+
 $command = $argv[1];
 
 // Just making sure that everything is where it should be
@@ -87,3 +89,8 @@ switch ($command) {
         echo("Available commands: sync_db / sync_city\n");
         break;
 }
+
+$time_end = microtime(true);
+$time = $time_end - $time_start;
+
+echo "Execution time: $time seconds\n";
