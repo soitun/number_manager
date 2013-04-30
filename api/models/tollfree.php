@@ -10,6 +10,7 @@ class models_tollfree extends models_model{
     private $_number;
     private $_last_update;
     private $_exist;
+    private $_db_name;
 
     // $number must be like 
     function __construct($number = null, $country = null) {
@@ -17,10 +18,8 @@ class models_tollfree extends models_model{
         $this->_exist = false;
 
         if ($number && $country) {
-            $country_obj = new models_country($country);
-
-            $this->_db_name = $country . '_' . substr($number, strlen($country_obj->get_prefix()), 3);
-            $query = "SELECT * FROM `toll_free` WHERE `number` = ?";
+            $this->_db_name = $this->get_db_name();
+            $query = "SELECT * FROM `" . $this->_db_name . "` WHERE `number` = ?";
             $stmt = $this->_db->prepare($query);
             $stmt->execute(array($number));
 
@@ -40,16 +39,17 @@ class models_tollfree extends models_model{
 
     public function search_by_number($pattern, $country, $limit = null, $offset = null) {
         $like = '1' . $pattern . '%';
+        $this->_db_name = $this->get_db_name($pattern, $country);
 
         if ($limit > 100)
             $limit = 100;
 
         if (!$limit && !$offset)
-            $query = "SELECT `number`, `last_update` FROM `toll_free` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT 10";
+            $query = "SELECT `number`, `last_update` FROM `" . $this->_db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT 10";
         elseif ($limit && $offset)
-            $query = "SELECT `number`, `last_update` FROM `toll_free` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $offset . ", " . $limit;
+            $query = "SELECT `number`, `last_update` FROM `" . $this->_db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $offset . ", " . $limit;
         elseif ($limit && !$offset)
-            $query = "SELECT `number`, `last_update` FROM `toll_free` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $limit;
+            $query = "SELECT `number`, `last_update` FROM `" . $this->_db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $limit;
         else
             return false;
 
@@ -69,7 +69,7 @@ class models_tollfree extends models_model{
     public function delete($number = null) {
         if (!$number) {
             if ($this->_id) {
-                $query = "DELETE FROM `toll_free` WHERE `id` = ?";
+                $query = "DELETE FROM `" . $this->_db_name . "` WHERE `id` = ?";
                 $stmt = $this->_db->prepare($query);
                 $stmt->execute(array($this->_id));
             }

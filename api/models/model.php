@@ -21,6 +21,11 @@ class models_model {
         //$this->_db = null;
     }
 
+    protected function get_db_name($pattern, $country) {
+        $country_obj = new models_country($country);
+        return $country . '_' . substr($pattern, strlen($country_obj->get_prefix()), 3);
+    }
+
     private function _init_mysql() {
         // Set the DSN (the string that determines what driver to user and how)
         $dsn = "mysql:host=" . $this->_settings->database->database_host . ";dbname=" . $this->_settings->database->database_name . ";charset=" . $this->_settings->database->database_charset;

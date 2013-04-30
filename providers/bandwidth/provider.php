@@ -34,12 +34,18 @@ class providers_bandwidth_provider implements providers_iprovider {
     }
 
     private function _insert_block($arr_numbers) {
+        print_r($arr_numbers);
+
         // Blocks
         $this->_obj_block->set_start_number($arr_numbers[0]);
         $previous_number = null;
         for ($i=0; $i < count($arr_numbers); $i++) { 
+            echo "in for \n";
             $current = (int)substr($arr_numbers[$i], -4);
             $next = (int)substr($arr_numbers[$i+1], -4);
+
+            echo "current: $current \n";
+            echo "next: $next \n";
 
             if($next) {
                 if($next == $current + 1) {
@@ -48,10 +54,11 @@ class providers_bandwidth_provider implements providers_iprovider {
                     $this->_obj_block->set_end_number($arr_numbers[$i]);
                     if ($this->_obj_block->insert()) {
                         $this->_obj_block->set_start_number($arr_numbers[$i+1]);
+                        continue;
                     } else 
                         exit('Could not save a block');
                 }
-
+            } else {
                 $this->_obj_block->set_end_number($arr_numbers[$i]);
                 if ($this->_obj_block->insert()) {
                     continue;
@@ -149,7 +156,7 @@ class providers_bandwidth_provider implements providers_iprovider {
 
         $xml_result = $this->_get_available_npa_nxx($area_code);
         foreach ($xml_result->AvailableNpaNxxList->AvailableNpaNxx as $result) {
-            $this->_obj_number->start_transaction();
+            //$this->_obj_number->start_transaction();
 
             $city = $result->City;
             $state = $result->State;
@@ -175,11 +182,9 @@ class providers_bandwidth_provider implements providers_iprovider {
             $arr_numbers = array_unique($arr_numbers, SORT_NUMERIC);
             sort($arr_numbers);
 
-            $this->_obj_block->start_transaction();
             $this->_insert_block($arr_numbers);
 
-            $this->_obj_number->commit();
-            $this->_obj_block->commit();
+            //$this->_obj_number->commit();
             sleep($this->_settings->wait_timer);
         }
     }

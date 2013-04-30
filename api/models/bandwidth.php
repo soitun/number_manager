@@ -141,6 +141,18 @@ class models_bandwidth {
 
         return curl_exec($this->_curl);
     }
+
+    public function get_number_status($number) {
+        echo $this->_settings->api_url . "tns/" . $number;
+
+        curl_setopt_array($this->_curl, array(
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_URL => $this->_settings->api_url . "tns/" . $number,
+            CURLOPT_POSTFIELDS => null
+        ));
+
+        return curl_exec($this->_curl);
+    }
 }
 
  ?>

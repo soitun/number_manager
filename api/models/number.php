@@ -11,8 +11,8 @@ class models_numbers extends models_model{
     private $_last_update;
     private $_city;
     private $_state;
-    private $_db_name;
     private $_exist;
+    private $_db_name;
 
     // $number must be like 
     function __construct($number = null, $country = null) {
@@ -20,9 +20,7 @@ class models_numbers extends models_model{
         $this->_exist = false;
 
         if ($number && $country) {
-            $country_obj = new models_country($country);
-
-            $this->_db_name = $country . '_' . substr($number, strlen($country_obj->get_prefix()), 3);
+            $this->_db_name = $this->get_db_name($number, $country);
             $query = "SELECT * FROM `" . $this->_db_name . "` WHERE `number` = ?";
             $stmt = $this->_db->prepare($query);
             $stmt->execute(array($number));
@@ -42,18 +40,18 @@ class models_numbers extends models_model{
     }
 
     public function search_by_number($pattern, $country, $limit = null, $offset = null) {
-        $like = '1' . $pattern . '%';
-        $db_name = $country . '_' . substr($pattern, 0, 3);
+        $like = $pattern . '%';
+        $this->_db_name = $this->get_db_name($pattern, $country);
 
         if ($limit > 100)
             $limit = 100;
 
         if (!$limit && !$offset)
-            $query = "SELECT `number`, `last_update`, `city`, `state` FROM `" . $db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT 10";
+            $query = "SELECT `number`, `last_update`, `city`, `state` FROM `" . $this->_db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT 10";
         elseif ($limit && $offset)
-            $query = "SELECT `number`, `last_update`, `city`, `state` FROM `" . $db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $offset . ", " . $limit;
+            $query = "SELECT `number`, `last_update`, `city`, `state` FROM `" . $this->_db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $offset . ", " . $limit;
         elseif ($limit && !$offset)
-            $query = "SELECT `number`, `last_update`, `city`, `state` FROM `" . $db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $limit;
+            $query = "SELECT `number`, `last_update`, `city`, `state` FROM `" . $this->_db_name . "` WHERE `number` LIKE ? ORDER BY `number` ASC LIMIT " . $limit;
         else
             return false;
 
@@ -81,8 +79,6 @@ class models_numbers extends models_model{
             // TBI
         }
     }
-
-
 }
 
  ?>
