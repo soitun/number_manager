@@ -35,13 +35,17 @@ switch ($command) {
             case 'create':
                 $db_obj->create();
                 break;
+                
+            case 'update':
+                $db_obj->update();
+                break;
 
             case 'create_tollfree':
                 $db_obj->create_tollfree();
                 break;
-                
-            case 'update':
-                $db_obj->update();
+
+            case 'update_tollfree':
+                $db_obj->update_tollfree();
                 break;
 
             default:

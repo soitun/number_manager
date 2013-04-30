@@ -32,7 +32,7 @@ class scripts_database {
         while (!feof($this->_file)) {
             $current_area_code = trim(fgets($this->_file));
             $objBandwidth = new providers_bandwidth_provider();
-            $objBandwidth->create_tollfree($current_area_code);
+            $objBandwidth->sync_tollfree($current_area_code);
         }
     }
 
@@ -50,7 +50,7 @@ class scripts_database {
         while (!feof($this->_file)) {
             $current_area_code = trim(fgets($this->_file));
             $objBandwidth = new providers_bandwidth_provider();
-            $objBandwidth->update_tollfree($current_area_code);
+            $objBandwidth->sync_tollfree($current_area_code, true);
         }
     }
 }

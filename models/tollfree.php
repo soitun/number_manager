@@ -9,6 +9,7 @@ class models_tollfree extends models_model {
     private $_id;
     private $_number;
     private $_last_update;
+    private $_db_name;
 
     // === Setter ===
 
@@ -22,6 +23,28 @@ class models_tollfree extends models_model {
 
     public function set_provider($provider) {
         $this->_provider = $provider;
+    }
+
+    public function set_or_create_db($db_name, $create = true) {
+        $this->_db_name = $db_name;
+
+        if ($create) {
+            try {
+                $query = "CREATE TABLE IF NOT EXISTS `" . $db_name . "` (
+                  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                  `number` bigint(20) unsigned NOT NULL,
+                  `provider` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+                  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY (`id`),
+                  UNIQUE KEY `number` (`number`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;";
+
+                $stmt = $this->_db->prepare($query);
+                $stmt->execute();
+            } catch (PDOException $e) {
+                return false;
+            }
+        }
     }
 
     // === Getter ===
@@ -60,26 +83,10 @@ class models_tollfree extends models_model {
         $this->_db->rollBack();
     }
 
-    public function get_by_number($pattern) {
-        $like = $pattern . '%';
-        $db_name = $country . '_' . $area_code;
-
-        if (!$limit && !$offset)
-            $query = "SELECT * FROM `toll_free` WHERE `number` LIKE ?";
-
-        $stmt = $this->_db->prepare($query);
-        $stmt->execute(array($like));
-
-        if ($stmt->rowCount())
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        else
-            return false;
-    }
-
     // Adding number in DB
     public function insert() {
         try {
-            $stmt = $this->_db->prepare("INSERT INTO `toll_free` (`number`, `provider`) VALUES(?, ?)");
+            $stmt = $this->_db->prepare("INSERT INTO `" . $this->_db_name . "` (`number`, `provider`) VALUES(?, ?)");
             $stmt->execute(array($this->_number, $this->_provider));
         } catch (PDOException $e) {
             echo $e->getMessage() . "\n";
@@ -89,18 +96,9 @@ class models_tollfree extends models_model {
         return true;
     }
 
-    public function delete_like_number($number) {
-        $like = $number . '%';
-
-        try {
-            $stmt = $this->_db->prepare("DELETE FROM `" . $this->_db_name . "` WHERE `number` LIKE ?");
-            $stmt->execute(array($like));
-        } catch (PDOException $e) {
-            echo $e->getMessage() . "\n";
-            return false;
-        }
-
-        return true;
+    public function truncate() {
+        $query = "TRUNCATE TABLE `" . $this->_db_name . "`";
+        $this->_db->query($query);
     }
 }
 

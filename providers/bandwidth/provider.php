@@ -155,7 +155,7 @@ class providers_bandwidth_provider implements providers_iprovider {
 
             $xml_number_result = $this->_get_available_numbers_by_npa_nxx($npanxx);
 
-            $this->_obj_number->set_or_create_db('US_' . $area_code);
+            $this->_obj_number->create_db('US_' . $area_code);
 
             // Numbers array
             $arr_numbers = array();
@@ -192,12 +192,18 @@ class providers_bandwidth_provider implements providers_iprovider {
         return simplexml_load_string(curl_exec($this->_curl));
     }
 
-    public function create_tollfree($area_code) {
+    public function sync_tollfree($area_code, $update = false) {
         if (!$area_code)
             die("Empty area code\n");
 
         $this->_obj_tollfree = new models_tollfree("bandwidth");
         $this->_obj_tollfree->start_transaction();
+
+        $this->_obj_tollfree->set_or_create_db('US_' . $area_code);
+
+        if($update)
+            // Delete table values
+            $this->_obj_tollfree->truncate();
 
         $xml_result = $this->_get_tollfree_numbers($area_code);
         foreach ($xml_result->TelephoneNumberList->TelephoneNumber as $number) {
@@ -206,6 +212,7 @@ class providers_bandwidth_provider implements providers_iprovider {
         }
 
         $this->_obj_tollfree->commit();
+        sleep($this->_settings->wait_timer);
     }
 }
 
