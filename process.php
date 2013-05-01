@@ -54,7 +54,7 @@ switch ($command) {
 
             default:
                 echo("ERROR: Wrong argument\n");
-                echo("Available args: sync / update\n");
+                echo("Available args: create(_tollfree) / update(_tollfree)\n");
                 break;
         }
         break;
