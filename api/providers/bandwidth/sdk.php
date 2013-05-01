@@ -5,7 +5,7 @@
  * @author Francis Genet
  * @package Number_manager_api
  */
-class models_bandwidth {
+class providers_bandwidth_sdk {
     private $_curl;
     private $_settings;
     private $_obj_number;
