@@ -40,12 +40,8 @@ class providers_bandwidth_provider implements providers_iprovider {
         $this->_obj_block->set_start_number($arr_numbers[0]);
         $previous_number = null;
         for ($i=0; $i < count($arr_numbers); $i++) { 
-            echo "in for \n";
             $current = (int)substr($arr_numbers[$i], -4);
             $next = (int)substr($arr_numbers[$i+1], -4);
-
-            echo "current: $current \n";
-            echo "next: $next \n";
 
             if($next) {
                 if($next == $current + 1) {

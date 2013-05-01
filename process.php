@@ -33,18 +33,22 @@ switch ($command) {
 
         switch ($arg) {
             case 'create':
+                echo "Generating main database... \n";
                 $db_obj->create();
                 break;
                 
             case 'update':
+                echo "Updating main database... \n";
                 $db_obj->update();
                 break;
 
             case 'create_tollfree':
+                echo "Generating tollfree database... \n";
                 $db_obj->create_tollfree();
                 break;
 
             case 'update_tollfree':
+                echo "Updating tollfree database... \n";
                 $db_obj->update_tollfree();
                 break;
 
