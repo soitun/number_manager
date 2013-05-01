@@ -39,7 +39,7 @@ class providers_bandwidth_provider implements providers_iprovider {
         $previous_number = null;
         for ($i=0; $i < count($arr_numbers); $i++) { 
             $current = (int)substr($arr_numbers[$i], -4);
-            $next = (int)substr($arr_numbers[$i+1], -4);
+            $next = isset($arr_numbers[$i+1]) ? (int)substr($arr_numbers[$i+1], -4) : null;
 
             if($next) {
                 if($next == $current + 1) {
