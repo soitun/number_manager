@@ -58,7 +58,6 @@ class models_block extends models_model {
     }
 
     public function insert() {
-        echo "insert \n";
         $this->_size = ($this->_end_number - $this->_start_number) + 1;
         try {
             $stmt = $this->_db->prepare("INSERT INTO `blocks`(`size`, `start_number`, `end_number`, `provider`) VALUES(?, ?, ?, ?)");
