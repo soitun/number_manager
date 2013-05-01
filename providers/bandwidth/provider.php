@@ -34,8 +34,6 @@ class providers_bandwidth_provider implements providers_iprovider {
     }
 
     private function _insert_block($arr_numbers) {
-        print_r($arr_numbers);
-
         // Blocks
         $this->_obj_block->set_start_number($arr_numbers[0]);
         $previous_number = null;
