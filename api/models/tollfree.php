@@ -38,7 +38,7 @@ class models_tollfree extends models_model{
     }
 
     public function search_by_number($pattern, $country, $limit = null, $offset = null) {
-        $like = '1' . $pattern . '%';
+        $like = $pattern . '%';
         $this->_db_name = $this->get_db_name($pattern, $country);
 
         if ($limit > 100)
