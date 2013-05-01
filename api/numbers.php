@@ -87,7 +87,7 @@ class Numbers {
      * @url PUT /{country}/order
      */
     function order($request_data, $country) {
-        $bandwidth = new models_bandwidth();
+        $bandwidth = new providers_bandwidth_sdk();
         $country_obj = new models_country($country);
 
         // The numbers should be ordered first.
@@ -103,6 +103,7 @@ class Numbers {
 
     /**
      * Check number(s) status
+     * /!\ Will only return success for now
      *
      * @url GET /{country}/status
      */
@@ -111,7 +112,8 @@ class Numbers {
         $result = array();
 
         foreach ($request_data['data'] as $number) {
-            $pref_number = $country_obj->get_prefix() . $number;
+            $tmp['status'] = "success";
+            /*$pref_number = $country_obj->get_prefix() . $number;
             $tmp = array("number" => $number);
 
             $number_obj = new models_number($pref_number, $country);
@@ -119,7 +121,7 @@ class Numbers {
                 $tmp['status'] = "success";
             } else {
                 $tmp['status'] = "error";
-            }
+            }*/
 
             array_push($result, $tmp);
         }
@@ -133,7 +135,7 @@ class Numbers {
      * @url PUT /{country}/block_status
      */
     function block_status($request_data, $country) {
-        $bandwidth = new models_bandwidth();
+        $bandwidth = new providers_bandwidth_sdk();
 
         foreach ($request_data['data'] as $number) {
             return $bandwidth->get_number_status($number);
