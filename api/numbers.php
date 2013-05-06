@@ -132,7 +132,7 @@ class Numbers {
     /**
      * Check number(s) status
      *
-     * @url PUT /{country}/block_status
+     * @url GET /{country}/_block_status
      */
     function block_status($request_data, $country) {
         $bandwidth = new providers_bandwidth_sdk();
