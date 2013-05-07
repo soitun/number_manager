@@ -112,6 +112,7 @@ class Numbers {
         $result = array();
 
         foreach ($request_data['data'] as $number) {
+            $tmp = array("number" => $number);
             $tmp['status'] = "success";
             /*$pref_number = $country_obj->get_prefix() . $number;
             $tmp = array("number" => $number);
