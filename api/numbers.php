@@ -105,7 +105,7 @@ class Numbers {
      * Check number(s) status
      * /!\ Will only return success for now
      *
-     * @url GET /{country}/status
+     * @url POST /{country}/status
      */
     function status($request_data, $country) {
         $country_obj = new models_country($country);
