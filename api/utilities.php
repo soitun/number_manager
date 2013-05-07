@@ -13,7 +13,11 @@ class Utilities {
 
     }
 
-    // Yep...
+    /**
+     * Options requests
+     *
+     * @url OPTIONS /countries
+     */
     function options() {
         return;
     }

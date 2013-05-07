@@ -13,7 +13,16 @@ class Numbers {
 
     }
 
-    // Yep...
+    /**
+     * Options requests
+     *
+     * @url OPTIONS /{country}/search
+     * @url OPTIONS /{country}/search_tollfree
+     * @url OPTIONS /{country}/block_search
+     * @url OPTIONS /{country}/order
+     * @url OPTIONS /{country}/status
+     * @url OPTIONS /{country}/_block_status
+     */
     function options() {
         return;
     }
