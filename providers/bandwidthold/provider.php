@@ -25,6 +25,8 @@ class providers_bandwidthold_provider extends providers_aprovider {
         if (!$area_code)
             die("Empty area code\n");
 
-        echo $area_code . '\r\n';
+        // Creating models
+        $this->_obj_number = new models_number("bandwidthold");
+        
     }
 }
