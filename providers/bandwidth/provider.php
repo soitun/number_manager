@@ -1,21 +1,18 @@
 <?php 
 
-class providers_bandwidth_provider implements providers_iprovider {
+class providers_bandwidth_provider extends providers_aprovider {
     private $_curl;
-    private $_settings;
     private $_obj_number;
-    private $_obj_block;
     private $_obj_tollfree;
 
     function __construct() {
-        $general_settings = helper_settings::get_instance();
-        $this->_settings = $general_settings->providers->{ENVIRONMENT}->bandwidth;
+        parent::__construct();
         $this->_init_curl();
     }
 
     function __destruct() {
         curl_close($this->_curl);
-        $this->_db = null;
+        parent::__destruct();
     }
 
     // Initializing curl with common params
@@ -31,35 +28,6 @@ class providers_bandwidth_provider implements providers_iprovider {
             CURLOPT_CAINFO => CERTS_PATH . "apitest.crt",
             CURLOPT_USERPWD => $this->_settings->username . ":" . $this->_settings->password
         ));
-    }
-
-    private function _insert_block($arr_numbers) {
-        // Blocks
-        $this->_obj_block->set_start_number($arr_numbers[0]);
-        $previous_number = null;
-        for ($i=0; $i < count($arr_numbers); $i++) { 
-            $current = (int)substr($arr_numbers[$i], -4);
-            $next = isset($arr_numbers[$i+1]) ? (int)substr($arr_numbers[$i+1], -4) : null;
-
-            if($next) {
-                if($next == $current + 1) {
-                    continue;
-                } else {
-                    $this->_obj_block->set_end_number($arr_numbers[$i]);
-                    if ($this->_obj_block->insert()) {
-                        $this->_obj_block->set_start_number($arr_numbers[$i+1]);
-                        continue;
-                    } else 
-                        exit('Could not save a block');
-                }
-            } else {
-                $this->_obj_block->set_end_number($arr_numbers[$i]);
-                if ($this->_obj_block->insert()) {
-                    continue;
-                } else 
-                    exit('Could not save a block');
-            }
-        }
     }
 
     private function _get_available_npa_nxx($area_code) {
@@ -84,6 +52,49 @@ class providers_bandwidth_provider implements providers_iprovider {
         ));
 
         return simplexml_load_string(curl_exec($this->_curl));
+    }
+
+    public function create($area_code) {
+        if (!$area_code)
+            die("Empty area code\n");
+
+        // Creating models
+        $this->_obj_number = new models_number("bandwidth");
+        $this->_obj_block = new models_block("bandwidth");
+
+        $xml_result = $this->_get_available_npa_nxx($area_code);
+        foreach ($xml_result->AvailableNpaNxxList->AvailableNpaNxx as $result) {
+            //$this->_obj_number->start_transaction();
+
+            $city = $result->City;
+            $state = $result->State;
+            $npanxx = $result->Npa . $result->Nxx;
+
+            $xml_number_result = $this->_get_available_numbers_by_npa_nxx($npanxx);
+
+            $this->_obj_number->create_db('US_' . $area_code);
+
+            // Numbers array
+            $arr_numbers = array();
+            foreach ($xml_number_result->TelephoneNumberList->TelephoneNumber as $number) {
+                $this->_obj_number->set_number('1' . $number);
+                $this->_obj_number->set_city($city);
+                $this->_obj_number->set_state($state);
+                $this->_obj_number->insert();
+
+                // building the number array
+                $arr_numbers[] = (int)'1' . $number;
+            }
+
+            // Sort from lowest to highest
+            $arr_numbers = array_unique($arr_numbers, SORT_NUMERIC);
+            sort($arr_numbers);
+
+            $this->_insert_block($arr_numbers);
+
+            //$this->_obj_number->commit();
+            sleep($this->_settings->wait_timer);
+        }
     }
 
     public function update($area_code) {
@@ -136,49 +147,6 @@ class providers_bandwidth_provider implements providers_iprovider {
             $this->_obj_number->commit();
             $this->_obj_block->commit();
 
-            sleep($this->_settings->wait_timer);
-        }
-    }
-
-    public function create($area_code) {
-        if (!$area_code)
-            die("Empty area code\n");
-
-        // Creating models
-        $this->_obj_number = new models_number("bandwidth");
-        $this->_obj_block = new models_block("bandwidth");
-
-        $xml_result = $this->_get_available_npa_nxx($area_code);
-        foreach ($xml_result->AvailableNpaNxxList->AvailableNpaNxx as $result) {
-            //$this->_obj_number->start_transaction();
-
-            $city = $result->City;
-            $state = $result->State;
-            $npanxx = $result->Npa . $result->Nxx;
-
-            $xml_number_result = $this->_get_available_numbers_by_npa_nxx($npanxx);
-
-            $this->_obj_number->create_db('US_' . $area_code);
-
-            // Numbers array
-            $arr_numbers = array();
-            foreach ($xml_number_result->TelephoneNumberList->TelephoneNumber as $number) {
-                $this->_obj_number->set_number('1' . $number);
-                $this->_obj_number->set_city($city);
-                $this->_obj_number->set_state($state);
-                $this->_obj_number->insert();
-
-                // building the number array
-                $arr_numbers[] = (int)'1' . $number;
-            }
-
-            // Sort from lowest to highest
-            $arr_numbers = array_unique($arr_numbers, SORT_NUMERIC);
-            sort($arr_numbers);
-
-            $this->_insert_block($arr_numbers);
-
-            //$this->_obj_number->commit();
             sleep($this->_settings->wait_timer);
         }
     }

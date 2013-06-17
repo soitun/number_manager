@@ -21,36 +21,40 @@ class scripts_database {
     public function create() {
         // Bandwidth
         while (!feof($this->_file)) {
-            $current_area_code = trim(fgets($this->_file));
+            /*$current_area_code = trim(fgets($this->_file));
             $objBandwidth = new providers_bandwidth_provider();
-            $objBandwidth->create($current_area_code);
+            $objBandwidth->create($current_area_code);*/
+
+            $current_area_code = trim(fgets($this->_file));
+            $objBandwidthOld = new providers_bandwidthold_provider();
+            $objBandwidthOld->create($current_area_code);
         }
     }
 
     public function create_tollfree() {
         // Bandwidth
         while (!feof($this->_file)) {
-            $current_area_code = trim(fgets($this->_file));
+            /*$current_area_code = trim(fgets($this->_file));
             $objBandwidth = new providers_bandwidth_provider();
-            $objBandwidth->sync_tollfree($current_area_code);
+            $objBandwidth->sync_tollfree($current_area_code);*/
         }
     }
 
     public function update() {
         // Bandwidth
         while (!feof($this->_file)) {
-            $current_area_code = trim(fgets($this->_file));
+            /*$current_area_code = trim(fgets($this->_file));
             $objBandwidth = new providers_bandwidth_provider();
-            $objBandwidth->update($current_area_code);
+            $objBandwidth->update($current_area_code);*/
         }
     }
 
     public function update_tollfree() {
         // Bandwidth
         while (!feof($this->_file)) {
-            $current_area_code = trim(fgets($this->_file));
+            /*$current_area_code = trim(fgets($this->_file));
             $objBandwidth = new providers_bandwidth_provider();
-            $objBandwidth->sync_tollfree($current_area_code, true);
+            $objBandwidth->sync_tollfree($current_area_code, true);*/
         }
     }
 }
