@@ -20,6 +20,10 @@
                 "username": "",
                 "password": "",
                 "wait_timer": "2"
+            },
+            "bandwidthold": {
+                "developer_key": "",
+                "api_url": ""
             }
         },
 
@@ -32,6 +36,10 @@
                 "username": "",
                 "password": "",
                 "wait_timer": "2"
+            },
+            "bandwidthold": {
+                "developer_key": "",
+                "api_url": ""
             }
         }
     }
