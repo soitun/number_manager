@@ -96,17 +96,63 @@ class Numbers {
      * @url PUT /{country}/order
      */
     function order($request_data, $country) {
-        $bandwidth = new providers_bandwidth_sdk();
+        $number_list = $request_data['data'];
         $country_obj = new models_country($country);
+        $failed_numbers = array();
+        $identifiers = array();
 
-        // The numbers should be ordered first.
-        if (!$bandwidth->order($request_data['data']))
-            return array("status" => "error", "data" => array("message" => "Ay least one number was not available anymore"));
+        // I know that the following looks like I am doing too much foreach
+        // However, in this case, we need to do 3 different step.
 
-        // This will delete the numbers.
-        foreach ($request_data['data'] as $number) {
+        // First, we need to check the status for each number
+        foreach ($number_list as $number) {
             $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
-            $number_obj->delete();
+            $provider = $number_obj->get_provider();
+
+            $model_name = "providers_" . $provider . "_sdk";
+            $provider_obj = new $model_name();
+
+            echo $provider_obj->check_status($number, $country);
+
+            exit();
+
+            /*if (!$provider_obj->check_status($number))
+                $failed_numbers[] = $number;*/
+        }
+
+        // If every numbers are available
+        if (empty($failed_numbers)) {
+            // Then comes the order
+            foreach ($number_list as $number) {
+                $number = str_replace('+', '', $number);
+                $area_code = substr($number, 0, 3);
+
+                $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
+
+                if ($number_obj->exist()) {
+                    $provider = $number_obj->get_provider();
+                    $model_name = "providers_" . $provider . "_sdk";
+                    $provider_obj = new $model_name();
+                    
+                    // The numbers should be ordered first.
+                    if($provider_obj->order($request_data, $number))
+                        return array("status" => "error", "data" => array("message" => "The number $number was not available anymore"));
+                }
+            }
+
+            // Then the numbers must be deleted.
+            foreach ($number_list as $number) {
+                $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
+                $number_obj->delete();
+            }
+        } else {
+            foreach ($failed_numbers as $number) {
+                $tmp = array("number" => $number);
+                $tmp['status'] = "success";
+                array_push($result, $tmp);
+            }
+
+            return array("status" => "success", "data" => $result);
         }
     }
 
