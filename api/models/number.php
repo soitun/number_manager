@@ -5,14 +5,24 @@
  * @author Francis Genet
  * @package Number_manager_api
  */
-class models_numbers extends models_model{
+class models_numbers extends models_model {
     private $_id;
     private $_number;
     private $_last_update;
     private $_city;
     private $_state;
     private $_exist;
+    private $_provider;
     private $_db_name;
+    private $_number_identifier;
+
+    public function get_provider() {
+        return $this->_provider;
+    }
+
+    public function get_number_identifier() {
+        return $this->_number_identifier;
+    }
 
     // $number must be like 
     function __construct($number = null, $country = null) {
@@ -29,9 +39,11 @@ class models_numbers extends models_model{
                 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $this->_id = $result[0]['id'];
                 $this->_number = $result[0]['number'];
+                $this->_provider = $result[0]['provider'];
                 $this->_last_update = $result[0]['last_update'];
                 $this->_city = $result[0]['city'];
                 $this->_state = $result[0]['state'];
+                $this->_number_identifier = $result[0]['number_identifier'];
                 $this->_exist = true;
 
                 return true;
