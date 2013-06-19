@@ -109,56 +109,50 @@ class Numbers {
             $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
             $provider = $number_obj->get_provider();
 
+            // I think that I need to that to make the provider class name variable
+            // new providers_{$provider}_sdk does not seems to work
             $model_name = "providers_" . $provider . "_sdk";
             $provider_obj = new $model_name();
 
-            echo $provider_obj->check_status($number, $country);
-
-            exit();
-
-            /*if (!$provider_obj->check_status($number))
-                $failed_numbers[] = $number;*/
+            $check_result = $provider_obj->check_status($number, $country);
+            if (!$check_result)
+                $failed_numbers[] = $number;
+            else $identifiers[] = $check_result;
         }
 
         // If every numbers are available
         if (empty($failed_numbers)) {
             // Then comes the order
-            foreach ($number_list as $number) {
-                $number = str_replace('+', '', $number);
-                $area_code = substr($number, 0, 3);
-
-                $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
-
-                if ($number_obj->exist()) {
-                    $provider = $number_obj->get_provider();
-                    $model_name = "providers_" . $provider . "_sdk";
-                    $provider_obj = new $model_name();
-                    
-                    // The numbers should be ordered first.
-                    if($provider_obj->order($request_data, $number))
-                        return array("status" => "error", "data" => array("message" => "The number $number was not available anymore"));
-                }
+            foreach ($identifiers as $identifier) {
+                $provider = $number_obj->get_provider();
+                $model_name = "providers_" . $provider . "_sdk";
+                $provider_obj = new $model_name();
+                
+                // The numbers should be ordered first.
+                if(!$provider_obj->order($request_data, $identifier))
+                    return array("status" => "error", "data" => array("message" => "A number ($identifier) was not available anymore"));
             }
 
-            // Then the numbers must be deleted.
+            // Then the numbers must be deleted from the cache DB.
             foreach ($number_list as $number) {
                 $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
                 $number_obj->delete();
             }
+
+            return array("status" => "success", "data" => "The order is a success")
         } else {
             foreach ($failed_numbers as $number) {
                 $tmp = array("number" => $number);
-                $tmp['status'] = "success";
+                $tmp['status'] = "Unavailable";
                 array_push($result, $tmp);
             }
 
-            return array("status" => "success", "data" => $result);
+            return array("status" => "error", "data" => $result);
         }
     }
 
     /**
      * Check number(s) status
-     * /!\ Will only return success for now
      *
      * @url GET /{country}/status
      */
@@ -167,17 +161,20 @@ class Numbers {
         $result = array();
 
         foreach ($request_data['data'] as $number) {
-            $tmp = array("number" => $number);
-            $tmp['status'] = "success";
-            /*$pref_number = $country_obj->get_prefix() . $number;
-            $tmp = array("number" => $number);
+            $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
+            $provider = $number_obj->get_provider();
 
-            $number_obj = new models_number($pref_number, $country);
-            if($number_obj->exist()) {
-                $tmp['status'] = "success";
-            } else {
+            $model_name = "providers_" . $provider . "_sdk";
+            $provider_obj = new $model_name();
+
+            $check_result = $provider_obj->check_status($number, $country);
+            if (!$check_result) {
+                $tmp = array("number" => $number);
                 $tmp['status'] = "error";
-            }*/
+            } else {
+                $tmp = array("number" => $number);
+                $tmp['status'] = "success";
+            }
 
             array_push($result, $tmp);
         }
