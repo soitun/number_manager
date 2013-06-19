@@ -7,11 +7,13 @@
  */
 class models_number extends models_model {
     private $_id;
+    private $_provider;
     private $_number;
     private $_cache_date;
     private $_last_update;
     private $_city;
     private $_state;
+    private $_number_identifier;
     private $_db_name;
 
     // === Setter ===
@@ -34,6 +36,14 @@ class models_number extends models_model {
 
     public function set_state($state) {
         $this->_state = $state;
+    }
+
+    public function set_number_identifier($id) {
+        $this->_number_identifier = $id;
+    }
+
+    public function set_provider($provider) {
+        $this->_provider = $provider;
     }
 
     public function create_db($db_name) {
@@ -65,24 +75,32 @@ class models_number extends models_model {
 
     // === Getter ===
 
-    public function get_number($number) {
+    public function get_number() {
         return $this->_number;
     }
 
-    public function get_cache_date($cache_date) {
+    public function get_cache_date() {
         return $this->_cache_date;
     }
 
-    public function get_last_update($last_update) {
+    public function get_last_update() {
         return $this->_last_update;
     }
 
-    public function get_city($city) {
+    public function get_city() {
         return $this->_city;
     }
 
-    public function get_state($state) {
+    public function get_state() {
         return $this->_state;
+    }
+
+    public function get_provider() {
+        return $this->_provider;
+    }
+
+    public function get_number_indentifier() {
+        return $this->_number_identifier;
     }
 
     // ==============
