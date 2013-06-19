@@ -73,23 +73,37 @@ class providers_bandwidthold_sdk {
         else return false;
     }
 
-    public function order($request_data, $number) {
+    public function order($request_data, $identifier) {
         // We need to retrieve the number id first
         $timestamp = time();
-        /*$data = "<?xml version=\"1.0\"?>
+        $data = "<?xml version=\"1.0\"?>
         <basicNumberOrder xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"http://www.bandwidth.com/api/\">
             <developerKey>" . $this->_settings->developer_key . "</developerKey>
             <orderName>2600hz-" . $timestamp . "</orderName>
-            <extRefID>" .  . "</extRefID>
+            <extRefID>" . $request_data['extrefid'] . "</extRefID>
             <numberIDs>
-                <id>" .  . "</id>
+                <id>" . $identifier . "</id>
             </numberIDs>
-            <subscriber>" .  . "</subscriber>
+            <subscriber>" . $request_data['subscriber'] . "</subscriber>
             <endPoints>
                 <host>sipproxy001-aa-ord.2600hz.com</host>
                 <host>sipproxy001-aa-dfw.2600hz.com</host>
             </endPoints>
-        </basicNumberOrder>";*/
+        </basicNumberOrder>";
+
+        $url = $this->_settings->api_url . "numbers.api";
+
+        curl_setopt_array($this->_curl, array(
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_URL => $url,
+            CURLOPT_POSTFIELDS => $data
+        ));
+
+        $result = simplexml_load_string(curl_exec($this->_curl));
+
+        if ($result->status == "success")
+            return true;
+        else return false;
     }
 }
 
