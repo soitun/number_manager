@@ -16,6 +16,10 @@ class models_numbers extends models_model {
     private $_db_name;
     private $_number_identifier;
 
+    public function get_number() {
+        return $this->_number;
+    }
+
     public function get_provider() {
         return $this->_provider;
     }
@@ -76,7 +80,7 @@ class models_numbers extends models_model {
             return false;
     }
 
-    public function get_provider_from_identifier($number_identifier, $country) {
+    /*public function get_provider_from_identifier($number_identifier, $country) {
         $db_name = $this->get_db_name($pattern, $country);
         $query = "SELECT provider FROM `" . $db_name . "` WHERE `number_identifier` = ?";
 
@@ -87,7 +91,7 @@ class models_numbers extends models_model {
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             return $result[0]['provider'];
         } else return false;
-    }
+    }*/
 
     public function exist() {
         return $this->_exist;

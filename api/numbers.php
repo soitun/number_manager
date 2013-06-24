@@ -28,7 +28,7 @@ class Numbers {
     }
 
     /**
-     * Do a research by area code, npanxx or city
+     * Do a research by area code or npanxx
      *
      * @url GET /{country}/search
      */
@@ -99,7 +99,7 @@ class Numbers {
         $number_list = $request_data['data'];
         $country_obj = new models_country($country);
         $failed_numbers = array();
-        $identifiers = array();
+        $number_arr_obj = array();
 
         // I know that the following looks like I am doing too much foreach
         // However, in this case, we need to do 3 different step.
@@ -116,33 +116,36 @@ class Numbers {
 
             $check_result = $provider_obj->check_status($number, $country);
             if (!$check_result)
-                $failed_numbers[] = $number;
-            else $identifiers[] = $check_result;
+                $failed_numbers_arr_obj[] = $number_obj;
+            else $number_arr_obj[] = $number_obj;
         }
 
         // If every numbers are available
-        if (empty($failed_numbers)) {
+        if (empty($failed_numbers_arr_obj)) {
             // Then comes the order
-            foreach ($identifiers as $identifier) {
+            foreach ($number_arr_obj as $number_obj) {
+                $number = $number_obj->get_number();
+                $identifier = $number_obj->get_number_identifier();
+
                 $provider = $number_obj->get_provider();
                 $model_name = "providers_" . $provider . "_sdk";
                 $provider_obj = new $model_name();
                 
                 // The numbers should be ordered first.
-                if(!$provider_obj->order($request_data, $identifier))
-                    return array("status" => "error", "data" => array("message" => "A number ($identifier) was not available anymore"));
+                if(!$provider_obj->order($request_data, $identifier)) {
+                    return array("status" => "error", "data" => array("message" => "the $number ($identifier) was not available anymore"));
+                }
             }
 
             // Then the numbers must be deleted from the cache DB.
-            foreach ($number_list as $number) {
-                $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
+            foreach ($number_arr_obj as $number_obj) {
                 $number_obj->delete();
             }
 
             return array("status" => "success", "data" => "The order is a success")
         } else {
-            foreach ($failed_numbers as $number) {
-                $tmp = array("number" => $number);
+            foreach ($failed_numbers_arr_obj as $number_obj) {
+                $tmp = array("number" => $number_obj->get_number());
                 $tmp['status'] = "Unavailable";
                 array_push($result, $tmp);
             }
@@ -188,11 +191,11 @@ class Numbers {
      * @url GET /{country}/_block_status
      */
     function block_status($request_data, $country) {
-        $bandwidth = new providers_bandwidth_sdk();
+        /*$bandwidth = new providers_bandwidth_sdk();
 
         foreach ($request_data['data'] as $number) {
             return $bandwidth->get_number_status($number);
-        }
+        }*/
     }
 }
 
