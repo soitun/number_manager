@@ -76,6 +76,19 @@ class models_numbers extends models_model {
             return false;
     }
 
+    public function get_provider_from_identifier($number_identifier, $country) {
+        $db_name = $this->get_db_name($pattern, $country);
+        $query = "SELECT provider FROM `" . $db_name . "` WHERE `number_identifier` = ?";
+
+        $stmt = $this->_db->prepare($query);
+        $stmt->execute(array($number_identifier));
+
+        if ($stmt->rowCount()) {
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $result[0]['provider'];
+        } else return false;
+    }
+
     public function exist() {
         return $this->_exist;
     }
