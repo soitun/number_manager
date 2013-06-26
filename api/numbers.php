@@ -8,9 +8,43 @@
  * @version 1.0
  */
 
-class Numbers {
+class Numbers { 
     function __construct() {
 
+    }
+
+    private function _check_status_bulk($number_list, &$failed_numbers_arr_obj, &$number_arr_obj) {
+        foreach ($number_list as $number) {
+            $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
+            $provider = $number_obj->get_provider();
+
+            // I think that I need to that to make the provider class name variable
+            // new providers_{$provider}_sdk does not seems to work
+            $model_name = "providers_" . $provider . "_sdk";
+            $provider_obj = new $model_name();
+
+            $check_result = $provider_obj->check_status($number, $country);
+            
+            if (!$check_result) 
+                $failed_numbers_arr_obj[] = $number_obj;
+            else $number_arr_obj[] = $number_obj;
+        }
+    }
+
+    private function _order_bulk($request_data, $number_arr_obj) {
+        foreach ($number_arr_obj as $number_obj) {
+            $number = $number_obj->get_number();
+            $identifier = $number_obj->get_number_identifier();
+
+            $provider = $number_obj->get_provider();
+            $model_name = "providers_" . $provider . "_sdk";
+            $provider_obj = new $model_name();
+            
+            // The numbers should be ordered first.
+            if(!$provider_obj->order($request_data, $identifier)) {
+                return array("status" => "error", "data" => array("message" => "the $number ($identifier) was not available anymore"));
+            }
+        }
     }
 
     /**
@@ -98,45 +132,20 @@ class Numbers {
     function order($request_data, $country) {
         $number_list = $request_data['data'];
         $country_obj = new models_country($country);
-        $failed_numbers = array();
+        $failed_numbers_arr_obj = array();
         $number_arr_obj = array();
 
         // I know that the following looks like I am doing too much foreach
         // However, in this case, we need to do 3 different step.
 
         // First, we need to check the status for each number
-        foreach ($number_list as $number) {
-            $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
-            $provider = $number_obj->get_provider();
-
-            // I think that I need to that to make the provider class name variable
-            // new providers_{$provider}_sdk does not seems to work
-            $model_name = "providers_" . $provider . "_sdk";
-            $provider_obj = new $model_name();
-
-            $check_result = $provider_obj->check_status($number, $country);
-            if (!$check_result)
-                $failed_numbers_arr_obj[] = $number_obj;
-            else $number_arr_obj[] = $number_obj;
-        }
+        $this->_check_status_bulk($number_list, $failed_numbers_arr_obj, $number_arr_obj);        
 
         // If every numbers are available
         if (empty($failed_numbers_arr_obj)) {
             // Then comes the order
-            foreach ($number_arr_obj as $number_obj) {
-                $number = $number_obj->get_number();
-                $identifier = $number_obj->get_number_identifier();
-
-                $provider = $number_obj->get_provider();
-                $model_name = "providers_" . $provider . "_sdk";
-                $provider_obj = new $model_name();
-                
-                // The numbers should be ordered first.
-                if(!$provider_obj->order($request_data, $identifier)) {
-                    return array("status" => "error", "data" => array("message" => "the $number ($identifier) was not available anymore"));
-                }
-            }
-
+            $this->_order_bulk($request_data, $number_arr_obj);
+            
             // Then the numbers must be deleted from the cache DB.
             foreach ($number_arr_obj as $number_obj) {
                 $number_obj->delete();
