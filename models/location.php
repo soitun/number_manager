@@ -71,7 +71,7 @@ class models_location extends models_model {
     function __construct($country = null, $area_code = null) {
         parent::__construct();
         if($country && $area_code){
-            $this->_table_name = 'location' . '/' . $country . '/' . $area_code;
+            $this->_table_name = 'location' . '_' . $country . '_' . $area_code;
         }
     }
 
@@ -100,12 +100,14 @@ class models_location extends models_model {
 
     public function insert() {
         try {
+            echo($this->_table_name);
             $query = "INSERT INTO `" . $this->_table_name . "` (`npanxx`, `company`, `state`, `city`, `zipcode`, `county`) VALUES(?, ?, ?, ?, ?, ?)"; 
             $stmt = $this->_db->prepare($query);
-            $stmt->execute(array($this->_npanxx, $this->_company, $this->_state, $this->city, $this->zipcode, $this->county));
+            $stmt->execute(array($this->_npanxx, $this->_company, $this->_state, $this->_city, $this->_zipcode, $this->_county));
         } catch (PDOException $e) {
             return false;
         }
+        return true;
     }
 
 }
