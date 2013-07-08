@@ -75,7 +75,7 @@ switch ($command) {
             case 'list':
                 $list = scripts_utilsdb::get_table_list();
                 foreach ($list as $table) {
-                    echo $table . "\n";
+      //              echo $table . "\n";
                 }
                 break;
 
