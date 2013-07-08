@@ -7,6 +7,14 @@
  * @package Number_manager
  */
 
+$argv[0] = "process.php";
+$argv[1] = "utils";
+$argv[2] = "create_locations";
+$argv[3] = "CA";
+$argv[4] = "area_code_CA.txt";
+$argv[5] = "npa_nxx_test.csv";
+
+
 require_once 'bootstrap.php';
 
 $time_start = microtime(true);
@@ -69,6 +77,13 @@ switch ($command) {
                 foreach ($list as $table) {
                     echo $table . "\n";
                 }
+                break;
+
+            case 'create_locations':
+                $country = $argv[3];
+                $area_code_path = $argv[4];
+                $csv_list_path = $argv[5];
+                scripts_utilsdb::create_locations($country, $area_code_path, $csv_list_path);
                 break;
 
             case 'truncate':

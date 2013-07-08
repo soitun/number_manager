@@ -15,6 +15,7 @@ class models_numbers extends models_model {
     private $_provider;
     private $_db_name;
     private $_number_identifier;
+    private $_list_numbers;
 
     public function get_number() {
         return $this->_number;
@@ -78,6 +79,46 @@ class models_numbers extends models_model {
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         else
             return false;
+    }
+
+    /*get numbers from states*/
+    public function search_by_states($states, $country){
+        $this->_list_numbers = array();
+        $result = $this->_db->query("show tables");
+        $rows = $result->fetchAll(PDO::FETCH_NUM);
+        foreach ($rows as $row) {
+            if (preg_match("#^" . $country . "_[0-9]{3}$#", $row[0])) {
+                $query = "SELECT * FROM `" . $row[0] . "` WHERE `state` = ?";
+                $stmt = $this->_db->prepare($query);
+                $stmt->execute(array($states));
+                if ($stmt->rowCount()) {
+                    $number_result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $this->_list_numbers = array_merge($this->_list_numbers, $number_result);
+                }
+            }       
+        }       
+
+        return $this->_list_numbers;
+    }
+
+    /* get numbers from providers */
+    public function search_by_provider($provider){
+        $this->_list_numbers = array();
+        $result = $this->_db->query("show tables");
+        $rows = $result->fetchAll(PDO::FETCH_NUM);
+        foreach ($rows as $row) {
+            if (preg_match("#^[a-zA-Z]{2}_[0-9]{3}$#", $row[0])) {
+                $query = "SELECT * FROM `" . $row[0] . "` WHERE `provider` = ?";
+                $stmt = $this->_db->prepare($query);
+                $stmt->execute(array($provider));
+                if ($stmt->rowCount()) {
+                    $number_result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $this->_list_numbers = array_merge($this->_list_numbers, $number_result);
+                }
+            }   
+        }
+
+        return $this->_list_numbers;
     }
 
     /*public function get_provider_from_identifier($number_identifier, $country) {

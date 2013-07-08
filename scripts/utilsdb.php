@@ -43,6 +43,35 @@ class scripts_utilsdb {
         }
     }
 
+    public static function create_locations($country, $area_code_path, $csv_list_paths){
+        $lines = file($area_code_path);
+        foreach ($lines as $line_number => $row) {
+            $lines[$line_number] = trim($row);
+            $location_obj = new models_location(); 
+            $location_obj->create_table($country, $lines[$line_number]);
+        }
+
+        $file_handle = fopen($csv_list_paths, "r");
+        while (($data = fgetcsv($file_handle)) !== FALSE) {
+            if (in_array($data[0], $lines)) {
+                $location_obj = new models_location($country, $data[0]);
+                $location_obj->set_npanxx($data[0].$data[1]);
+                $location_obj->set_company($data[2]);
+                $location_obj->set_state($data[3]);
+                $location_obj->set_city($data[4]);
+                $location_obj->set_zipcode($data[6]);
+                $location_obj->set_county($data[7]);
+
+                if ($location_obj->insert())
+                    return false;
+            }
+        }
+
+        fclose($file_handle);
+        return true;
+    }
+
+
     public static function add_country($name, $iso_code, $local, $toll_free, $vanity, $prefix) {
         $db = scripts_utilsdb::_get_db_instance();
         $settings = helper_settings::get_instance();

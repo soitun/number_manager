@@ -60,6 +60,28 @@ class Numbers {
     function options() {
         return;
     }
+    /**
+     * Do a research by states
+     *
+     * @url GET /{country}/state/search
+     */
+    function search_by_states($request_data, $country){
+        $number_obj = new models_number();
+        $number_state_list = $number_obj->search_by_states($request_data['states'], $country);
+
+        return $number_state_list;
+    }
+
+    /**
+     * Do a research by providers
+     *
+     * @url GET /providers/search
+     */    
+    function search_by_providers($request_data) {
+        $number_obj = new models_number();
+        $number_list = $number_obj->search_by_provider($request_data['provider']);
+        return $number_list;
+    }
 
     /**
      * Do a research by area code or npanxx
@@ -151,7 +173,7 @@ class Numbers {
                 $number_obj->delete();
             }
 
-            return array("status" => "success", "data" => "The order is a success")
+            return array("status" => "success", "data" => "The order is a success");
         } else {
             foreach ($failed_numbers_arr_obj as $number_obj) {
                 $tmp = array("number" => $number_obj->get_number());
