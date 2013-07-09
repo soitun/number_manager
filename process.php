@@ -9,10 +9,10 @@
 
 $argv[0] = "process.php";
 $argv[1] = "utils";
-$argv[2] = "create_locations";
-$argv[3] = "CA";
-$argv[4] = "area_code_CA.txt";
-$argv[5] = "npa_nxx_test.csv";
+$argv[2] = "insert_locations";
+$argv[3] = "US";
+$argv[4] = "npaa.csv";
+
 
 
 require_once 'bootstrap.php';
@@ -75,15 +75,20 @@ switch ($command) {
             case 'list':
                 $list = scripts_utilsdb::get_table_list();
                 foreach ($list as $table) {
-      //              echo $table . "\n";
+                    echo $table . "\n";
                 }
                 break;
 
-            case 'create_locations':
+            case 'create_locations_tables':
                 $country = $argv[3];
                 $area_code_path = $argv[4];
-                $csv_list_path = $argv[5];
-                scripts_utilsdb::create_locations($country, $area_code_path, $csv_list_path);
+                scripts_utilsdb::create_locations_tables($country, $area_code_path);
+                break;
+
+            case 'insert_locations':
+                $country = $argv[3];
+                $csv_list_path = $argv[4];
+                scripts_utilsdb::insert_locations($country, $csv_list_path);
                 break;
 
             case 'truncate':
