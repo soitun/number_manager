@@ -13,8 +13,6 @@ $argv[2] = "insert_locations";
 $argv[3] = "US";
 $argv[4] = "npaa.csv";
 
-
-
 require_once 'bootstrap.php';
 
 $time_start = microtime(true);

@@ -104,7 +104,6 @@ class models_location extends models_model {
             $stmt = $this->_db->prepare($query);
             $stmt->execute(array($this->_npanxx, $this->_company, $this->_state, $this->_city, $this->_zipcode, $this->_county));
         } catch (PDOException $e) {
-            echo($e->getMessage());
             return false;
 
         }
