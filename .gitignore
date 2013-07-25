@@ -1,4 +1,5 @@
 config.json
 .DS_Store
 area_code_test.txt
+*.csv
 phpinfo.php
