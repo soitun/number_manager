@@ -7,9 +7,7 @@
  */
 class models_number extends models_model {
     private $_id;
-    private $_provider;
     private $_number;
-    private $_cache_date;
     private $_last_update;
     private $_city;
     private $_state;
@@ -20,10 +18,6 @@ class models_number extends models_model {
 
     public function set_number($number) {
         $this->_number = $number;
-    }
-
-    public function set_cache_date($cache_date) {
-        $this->_cache_date = $cache_date;
     }
 
     public function set_last_update($last_update) {
@@ -79,10 +73,6 @@ class models_number extends models_model {
         return $this->_number;
     }
 
-    public function get_cache_date() {
-        return $this->_cache_date;
-    }
-
     public function get_last_update() {
         return $this->_last_update;
     }
@@ -128,8 +118,8 @@ class models_number extends models_model {
     // Adding number in DB
     public function insert() {
         try {
-            $stmt = $this->_db->prepare("INSERT INTO `" . $this->_db_name . "` (`number`, `provider`, `city`, `state`) VALUES(?, ?, ?, ?)");
-            $stmt->execute(array($this->_number, $this->_provider, $this->_city, $this->_state));
+            $stmt = $this->_db->prepare("INSERT INTO `" . $this->_db_name . "` (`number`, `provider`, `city`, `state`, `number_indentifier`) VALUES(?, ?, ?, ?, ?)");
+            $stmt->execute(array($this->_number, $this->_provider, $this->_city, $this->_state, $this->_number_identifier));
         } catch (PDOException $e) {
             echo $e->getMessage() . "\n";
             return false;
