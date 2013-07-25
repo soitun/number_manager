@@ -23,7 +23,12 @@
             },
             "bandwidthold": {
                 "developer_key": "",
-                "api_url": ""
+                "api_url": "", 
+                "login": "",
+                "password": "",
+                "rc_filename": "",
+                "nbr_filename": "",
+                "max_zerocheck": 3
             }
         },
 
@@ -39,7 +44,12 @@
             },
             "bandwidthold": {
                 "developer_key": "",
-                "api_url": ""
+                "api_url": "", 
+                "login": "",
+                "password": "",
+                "rc_filename": "",
+                "nbr_filename": "",
+                "max_zerocheck": 3
             }
         }
     }
