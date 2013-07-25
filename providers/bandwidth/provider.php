@@ -6,6 +6,7 @@ class providers_bandwidth_provider extends providers_aprovider {
     private $_obj_tollfree;
 
     function __construct() {
+        $this->_provider_name = 'bandwidth';
         parent::__construct();
         $this->_init_curl();
     }
