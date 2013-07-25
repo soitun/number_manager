@@ -7,12 +7,6 @@
  * @package Number_manager
  */
 
-$argv[0] = "process.php";
-$argv[1] = "utils";
-$argv[2] = "insert_locations";
-$argv[3] = "US";
-$argv[4] = "npaa.csv";
-
 require_once 'bootstrap.php';
 
 $time_start = microtime(true);
@@ -100,6 +94,7 @@ switch ($command) {
                 $toll_free = $argv[6];
                 $vanity = $argv[7];
                 $prefix = $argv[8];
+                
                 scripts_utilsdb::add_country($name, $iso_code, $local, $toll_free, $vanity, $prefix);
                 break;
             
