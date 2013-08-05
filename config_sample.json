@@ -28,7 +28,8 @@
                 "password": "",
                 "rc_filename": "",
                 "nbr_filename": "",
-                "max_zerocheck": 3
+                "max_zerocheck": 3,
+                "wait_timer": "0"
             }
         },
 
@@ -49,7 +50,8 @@
                 "password": "",
                 "rc_filename": "",
                 "nbr_filename": "",
-                "max_zerocheck": 3
+                "max_zerocheck": 3,
+                "wait_timer": "3"
             }
         }
     }
