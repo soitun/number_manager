@@ -11,7 +11,6 @@ class providers_bandwidthold_provider extends providers_aprovider {
         parent::__construct();
 
         // Loading the zerocheck file
-
         $this->_zerocheck_obj = new helper_settings('assets/' . $this->_provider_name . '/zerocheck.json');
 
     }
@@ -42,34 +41,7 @@ class providers_bandwidthold_provider extends providers_aprovider {
         return $result;
     }
 
-    private function _search_numbers($rate_center, &$numbers, $prefixes = array("")) {
-        $quantity = 0;
-        foreach ($prefixes as $prefix) {
-            //$prefix = substr($prefix, 2, 6);
-            if ($prefix) 
-                echo " Searching with prefix $prefix\n";
-
-            $number_result = $this->_make_request("https://my.bandwidth.com/portal/Members/NumberManagement/ListNumbers.aspx?RateCenterID=" . $rate_center, "POST", "ddlGateway=anyGateway&ddlNumbertype=LI&ddlNumberIndicator=anyNumberIndicator&ddlStatus=Available&txtSearch=$prefix&ddlSearchType=FullNumber&ngNumbersGeneration%24GenerateOptions=radioRangeReplace&__EVENTTARGET=cmdSearchNumbers%24button&EVENTARGUMENT=&LASTFOCUS=&pager%24ddlGridPagesSize=5000&pager%24ddlGridPagesList=0");
-
-            // This will retrieve the number of numbers returned by the current request
-            preg_match('/Found Telephone Numbers \((\d*)\)/', $number_result, $match);
-            $quantity += $match[1];
-
-            $lines = explode("\n", $number_result);
-            foreach ($lines as $line) {
-                if (preg_match('/TelephoneNumberID=(.{36}).*?>(.*)<\/a>/', $line, $match)) {
-                    $telID = $match[1];
-                    $number = "+" . str_replace("-", "", strip_tags($match[2]));
-                    $numbers[$number] = array("telID" => $telID, "RateCenterID" => $rate_center);
-                    //echo '+' . $number . ',' . $telID . "\n";
-                }
-            }
-        }
-
-        return $quantity;
-    }
-
-    private function _download_rate_centers() {
+    private function _log_and_setup() {
         $zerocheck = $this->_zerocheck_obj->get_settings();
 
         /* STEP 1. let’s create a cookie file */
@@ -82,13 +54,15 @@ class providers_bandwidthold_provider extends providers_aprovider {
         /* STEP 3. Initialize bandwidth.com's server-side "session state" by loading the number listing page once */
         echo "Setting up server-side session (know as __VIEWSTATE) on bandwidth.com servers...\n";
         $this->_make_request('https://my.bandwidth.com/portal/Members/NumberManagement/ListRateCenter.aspx');
+    }
 
+    private function _download_rate_centers() {
         /* STEP 4. Download each rate center and parse unique Rate Center IDs */
         foreach ($this->_constants->states as $regionID => $state) {
             $id_list = array();
 
             echo "Now downloading rate centers for $state... ($regionID)\n";
-            $fp = fopen (ASSETS_PATH . $this->_provider_name . '/' . $this->_settings->rc_filename . '-' . $state, 'a');
+            $fp = fopen (ASSETS_PATH . $this->_provider_name . '/' . $this->_settings->rc_filename . '-' . $state, 'w+');
             $result = $this->_make_request('https://my.bandwidth.com/portal/Members/NumberManagement/ListRateCenter.aspx', 'POST', "__EVENTTARGET=rateCenterSearchControl%24cmdSearch%24button&rateCenterSearchControl%24ddlSearchType=Regions&rateCenterSearchControl%24tbwe_ClientState=&rateCenterSearchControl%24countryRegionControl%24ddlCountry=95fda5f2-fbfa-40a5-95e7-671e51e9d1b4&rateCenterSearchControl%24countryRegionControl%24ddlRegion=$regionID");
 
             $lines = explode("\n", $result);
@@ -114,6 +88,37 @@ class providers_bandwidthold_provider extends providers_aprovider {
         $this->_zerocheck_obj->write();
     }
 
+    private function _search_numbers($rate_center, &$numbers, $prefixes = array("")) {
+        $quantity = 0;
+        foreach ($prefixes as $prefix) {
+            //$prefix = substr($prefix, 2, 6);
+            if ($prefix) 
+                echo " Searching with prefix $prefix\n";
+
+            $number_result = $this->_make_request("https://my.bandwidth.com/portal/Members/NumberManagement/ListNumbers.aspx?RateCenterID=" . $rate_center, "POST", "ddlGateway=anyGateway&ddlNumbertype=LI&ddlNumberIndicator=anyNumberIndicator&ddlStatus=Available&txtSearch=$prefix&ddlSearchType=FullNumber&ngNumbersGeneration%24GenerateOptions=radioRangeReplace&__EVENTTARGET=cmdSearchNumbers%24button&EVENTARGUMENT=&LASTFOCUS=&pager%24ddlGridPagesSize=5000&pager%24ddlGridPagesList=0");
+
+            // This will * theorically * retrieve the number of numbers returned by the current request
+            if (preg_match('/Found Telephone Numbers \((\d*)\)/', $number_result, $match)) {
+
+                print_r($match);
+
+                $quantity += $match[1];
+
+                $lines = explode("\n", $number_result);
+                foreach ($lines as $line) {
+                    if (preg_match('/TelephoneNumberID=(.{36}).*?>(.*)<\/a>/', $line, $match)) {
+                        $telID = $match[1];
+                        $number = "+" . str_replace("-", "", strip_tags($match[2]));
+                        $numbers[$number] = array("telID" => $telID, "RateCenterID" => $rate_center);
+                        //echo '+' . $number . ',' . $telID . "\n";
+                    }
+                }
+            }
+        }
+
+        return $quantity;
+    }
+
     private function _dowload_numbers($state) {
         $arr_numbers = array();
         $zerocheck = $this->_zerocheck_obj->get_settings();
@@ -123,7 +128,7 @@ class providers_bandwidthold_provider extends providers_aprovider {
         $rate_centers = file(ASSETS_PATH . $this->_provider_name . '/' . $this->_settings->rc_filename . '-' . $state);
 
         /* STEP 2. Open output file. */
-        $fp = fopen (ASSETS_PATH . $this->_provider_name . '/' . $this->_settings->nbr_filename . '-' . $state, "a");
+        $fp = fopen (ASSETS_PATH . $this->_provider_name . '/' . $this->_settings->nbr_filename . '-' . $state, "w+");
 
         /* STEP 3. Begin going through each rate center, one by one */
         $get_all_rows = false;
@@ -152,10 +157,11 @@ class providers_bandwidthold_provider extends providers_aprovider {
                         // If you get 500 numbers back, there are more to be had! But bandwidth.com won't send them to you :(
                         // Figure out all the prefixes in the numbers list and then run a second query for each prefix to get the full list
                         $prefixes = array();
-                        foreach ($numbers as $number => $v) {
+
+                        /*foreach ($numbers as $number => $v) {
                             $prefixes[substr($number, 2, 5)] = true;
                         }
-                        $prefixes = array_keys($prefixes);
+                        $prefixes = array_keys($prefixes);*/
 
                         $quantity = $this->_search_numbers($rate_center, $numbers, $prefixes);
                         echo "  Found $quantity numbers on second try!\n";
@@ -190,6 +196,8 @@ class providers_bandwidthold_provider extends providers_aprovider {
                     $zerocheck->$rate_center = 0;
                 } else
                     $zerocheck->$rate_center = $zerocheck->$rate_center + 1;
+
+                sleep($this->_settings->wait_timer);
             }
         }
 
@@ -201,6 +209,7 @@ class providers_bandwidthold_provider extends providers_aprovider {
     }
 
     public function create() {
+        $this->_log_and_setup();
         $this->_download_rate_centers();
         foreach ($this->_constants->states as $regionID => $state) {
             $this->_dowload_numbers($state);
@@ -208,6 +217,7 @@ class providers_bandwidthold_provider extends providers_aprovider {
     }
 
     public function update() {
+        $this->_log_and_setup();
         foreach ($this->_constants->states as $regionID => $state) {
             $this->_dowload_numbers($state);
         }
