@@ -16,6 +16,12 @@ class scripts_utilsdb {
         }
     }
 
+    private function _count($db_name) {
+        $db = scripts_utilsdb::_get_db_instance();
+        $stmt = $db->query("SELECT id FROM `". $db_name . "`");
+        return $stmt->rowCount();
+    }
+
     public static function get_table_list() {
         $settings = helper_settings::get_instance();
         $db = scripts_utilsdb::_get_db_instance();
@@ -44,6 +50,7 @@ class scripts_utilsdb {
     }
 
     public static function create_locations_tables($country, $area_code_path){
+        echo "Loading $area_code_path...\n";
         $lines = file($area_code_path);
         foreach ($lines as $line_number => $row) {
             $lines[$line_number] = trim($row);
@@ -55,21 +62,25 @@ class scripts_utilsdb {
     }
 
     public static function insert_locations($country, $csv_list_paths){
+        echo "Loading $csv_list_paths...\n";
         $file_handle = fopen($csv_list_paths, "r");
         while (($data = fgetcsv($file_handle)) !== FALSE) {
-
+            echo "Inserting " . $data[0].$data[1] . "(" . $data[7] . ")...\n";
             $location_obj = new models_location($country, $data[0]);
             $location_obj->set_npanxx($data[0].$data[1]);
             $location_obj->set_company($data[2]);
             $location_obj->set_state($data[3]);
             $location_obj->set_city($data[4]);
+            $location_obj->set_county($data[5]);
             $location_obj->set_zipcode($data[6]);
-            $location_obj->set_county($data[7]);
+            $location_obj->set_rate_center($data[7]);
             $location_obj->insert();
-            
         }
-            fclose($file_handle);
-            return true;
+
+        // Closing the file
+        echo "Closing $csv_list_paths...\n";
+        fclose($file_handle);
+        return true;
     }
 
     public static function add_country($name, $iso_code, $local, $toll_free, $vanity, $prefix) {
@@ -85,6 +96,17 @@ class scripts_utilsdb {
         $country->set_name($name);
         $country->set_flag_url($settings->flags_url . strtoupper($iso_code) . ".png");
         $country->insert();
+    }
+
+    public static function count_numbers($country, $area_code_path) {
+        $count = 0;
+        echo "Loading $area_code_path...\n";
+        $lines = file($area_code_path);
+        foreach ($lines as $row) {
+            $count = $count + scripts_utilsdb::_count($country . '_' . trim($row));
+        }
+
+        return $count;
     }
 }
 

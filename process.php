@@ -71,6 +71,13 @@ switch ($command) {
                 }
                 break;
 
+            case 'count':
+                $country = $argv[3];
+                $area_code_path = $argv[4];
+                $count = scripts_utilsdb::count_numbers($country, $area_code_path);
+                echo "There are $count element in the DBs\n";
+                break;
+
             case 'create_locations_tables':
                 $country = $argv[3];
                 $area_code_path = $argv[4];
