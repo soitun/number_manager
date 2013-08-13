@@ -17,9 +17,14 @@ class scripts_utilsdb {
     }
 
     private function _count($db_name) {
-        $db = scripts_utilsdb::_get_db_instance();
-        $stmt = $db->query("SELECT id FROM `". $db_name . "`");
-        return $stmt->rowCount();
+        try {
+            $db = scripts_utilsdb::_get_db_instance();
+            $stmt = $db->query("SELECT id FROM `". $db_name . "`");
+            return $stmt->rowCount();
+        } catch (PDOException $e) {
+            echo $e->getMessage() . "\n";
+            return 0;
+        }
     }
 
     public static function get_table_list() {
