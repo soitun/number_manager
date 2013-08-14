@@ -30,6 +30,11 @@
                 "nbr_filename": "",
                 "max_zerocheck": 3,
                 "wait_timer": "0"
+            },
+            "o1": {
+                "auth_key": "",
+                "auth_secret": "",
+                "api_url": ""
             }
         },
 
@@ -52,6 +57,11 @@
                 "nbr_filename": "",
                 "max_zerocheck": 3,
                 "wait_timer": "3"
+            },
+            "o1": {
+                "auth_key": "",
+                "auth_secret": "",
+                "api_url": ""
             }
         }
     }
