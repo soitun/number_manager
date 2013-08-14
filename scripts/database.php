@@ -20,16 +20,21 @@ class scripts_database {
 
     public function create() {
         // Bandwidth old
-        $current_area_code = trim(fgets($this->_file));
+        /*$current_area_code = trim(fgets($this->_file));
         $objBandwidthOld = new providers_bandwidthold_provider();
-        $objBandwidthOld->create();
+        $objBandwidthOld->create();*/
+
+        // O1
 
         // Bandwidth
-        /*while (!feof($this->_file)) {
+        while (!feof($this->_file)) {
             $current_area_code = trim(fgets($this->_file));
-            $objBandwidth = new providers_bandwidth_provider();
-            $objBandwidth->create($current_area_code);
-        }*/
+            /*$objBandwidth = new providers_bandwidth_provider();
+            $objBandwidth->create($current_area_code);*/
+
+            $objO1 = new providers_o1_provider();
+            $objO1->create($current_area_code);
+        }
     }
 
     public function create_tollfree() {
