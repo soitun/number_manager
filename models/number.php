@@ -121,7 +121,7 @@ class models_number extends models_model {
             $stmt = $this->_db->prepare("INSERT INTO `" . $this->_db_name . "` (`number`, `provider`, `city`, `state`, `number_indentifier`) VALUES(?, ?, ?, ?, ?)");
             $stmt->execute(array($this->_number, $this->_provider, $this->_city, $this->_state, $this->_number_identifier));
         } catch (PDOException $e) {
-            echo $e->getMessage() . "\n";
+            //echo $e->getMessage() . "\n";
             return false;
         }
 

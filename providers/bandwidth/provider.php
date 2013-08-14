@@ -87,10 +87,6 @@ class providers_bandwidth_provider extends providers_aprovider {
                 $arr_numbers[] = (int)'1' . $number;
             }
 
-            // Sort from lowest to highest
-            $arr_numbers = array_unique($arr_numbers, SORT_NUMERIC);
-            sort($arr_numbers);
-
             $this->_insert_block($arr_numbers);
 
             //$this->_obj_number->commit();

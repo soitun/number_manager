@@ -184,10 +184,6 @@ class providers_bandwidthold_provider extends providers_aprovider {
                         $arr_numbers[] = $number;
                     }
 
-                    // Sort from lowest to highest
-                    $arr_numbers = array_unique($arr_numbers, SORT_NUMERIC);
-                    sort($arr_numbers);
-
                     // And finally inserting the blocks
                     $this->_insert_block($arr_numbers);
 
