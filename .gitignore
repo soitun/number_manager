@@ -4,5 +4,7 @@ area_code_test.txt
 *.csv
 phpinfo.php
 
+api/logs/*
+
 assets/bandwidthold/numbers-*
 assets/bandwidthold/rate_center-*
