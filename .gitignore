@@ -3,3 +3,6 @@ config.json
 area_code_test.txt
 *.csv
 phpinfo.php
+
+assets/bandwidthold/numbers-*
+assets/bandwidthold/rate_center-*
