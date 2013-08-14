@@ -75,7 +75,7 @@ switch ($command) {
                 $country = $argv[3];
                 $area_code_path = $argv[4];
                 $count = scripts_utilsdb::count_numbers($country, $area_code_path);
-                echo "There are $count element in the DBs\n";
+                echo "There are $count element(s) in the DBs\n";
                 break;
 
             case 'create_locations_tables':
@@ -107,14 +107,14 @@ switch ($command) {
             
             default:
                 echo("ERROR: Wrong argument\n");
-                echo("Available args: list / truncate\n");
+                echo("Available args: list / count / create_locations_tables / insert_locations / truncate / add_country\n");
                 break;
         }
         break;
 
     default:
         echo("ERROR: Wrong command\n");
-        echo("Available commands: sync_db / sync_city\n");
+        echo("Available commands: database / utils\n");
         break;
 }
 
