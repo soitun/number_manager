@@ -75,7 +75,9 @@ class providers_o1_provider extends providers_aprovider {
     }
 
     public function create($area_code) {
+        echo "Adding number for area_code $area_code\n";
         $this->_obj_number = new models_number("o1");
+        $arr_numbers = array();
 
         // The data sent to the server
         $post = array(
@@ -84,22 +86,29 @@ class providers_o1_provider extends providers_aprovider {
         );
         $response = $this->_send('json', '/Dids/search', $post);
 
-        // Just making sure that the table exist
-        $this->_obj_number->create_db('US_' . $area_code);
+        if (!empty($response)) {
+            // Just making sure that the table exist
+            $this->_obj_number->create_db('US_' . $area_code);
 
-        if ($response != false) {
             foreach ($response->dids as $did) {
                 // Location is something like 'Stockton, CA'
                 $location_exp = explode(',', $did->did->location);
                 $city = trim($location_exp[0]);
                 $state = trim($location_exp[1]);
-                $this->_obj_number->set_number('1' . $did->did->tn);
+                $number = $did->did->tn;
+
+                $this->_obj_number->set_number('1' . $number);
                 $this->_obj_number->set_city($city);
                 $this->_obj_number->set_state($state);
-                $this->_obj_number->set_number_identifier($did->did->tn);
+                $this->_obj_number->set_number_identifier($number);
                 $this->_obj_number->insert();
+
+                $arr_numbers[] = $number;
             }
         }
+
+        // And finally inserting the blocks
+        $this->_insert_block($arr_numbers);
     }
 
     public function update() {
