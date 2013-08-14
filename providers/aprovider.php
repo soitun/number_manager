@@ -13,7 +13,8 @@ abstract class providers_aprovider {
 
         // Constants
         $constants = helper_settings::get_instance('constants.json');
-        $this->_constants = $constants->{$this->_provider_name};
+        if (property_exists($constants, $this->_provider_name))
+            $this->_constants = $constants->{$this->_provider_name};
 
         $this->_obj_block = new models_block($this->_provider_name);
     }
