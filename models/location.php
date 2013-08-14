@@ -10,12 +10,13 @@ class models_location extends models_model {
     private $_table_name;
     private $_npanxx;
     private $_company;
-    private $_city;
     private $_state;
+    private $_city;
     private $_county;
     private $_zipcode;
+    private $_rate_center;
 
-// === Setter ===
+    // === Setter ===
 
     public function set_npanxx($npanxx) {
         $this->_npanxx = $npanxx;
@@ -41,6 +42,9 @@ class models_location extends models_model {
         $this->_county = $county;
     }
 
+    public function set_rate_center($rate_center) {
+        $this->_rate_center = $rate_center;
+    }
 
     // === Getter ===
 
@@ -76,36 +80,40 @@ class models_location extends models_model {
     }
 
     public function create_table($country, $area_code) {
+        echo "Creating table for $area_code ($country)...\n";
         $this->_table_name = 'location' . '_' . $country . '_' . $area_code;
+        echo "The table name will be: " . $this->_table_name . "\n";
         try{
             $query = "CREATE TABLE IF NOT EXISTS `". $this->_table_name . "` (
                 `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
                 `npanxx` int(7) unsigned NOT NULL,
                 `company` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
                 `state` varchar(3) COLLATE utf8_unicode_ci NOT NULL,
-                `city` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+                `city` varchar(100) COLLATE utf8_unicode_ci,
                 `zipcode` int(7) unsigned NOT NULL,
                 `county` varchar(50) COLLATE utf8_unicode_ci,
+                `rate_center` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
                 PRIMARY KEY (`id`),
                 UNIQUE KEY `npanxx` (`npanxx`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;";
             
             $stmt = $this->_db->prepare($query);
             $stmt->execute();
+
+            echo "Done! \n";
         }   catch (PDOException $e) {
+            echo $e->getMessage();
             return false;
         }
     }
 
-
     public function insert() {
         try {
-            $query = "INSERT INTO `" . $this->_table_name . "` (`npanxx`, `company`, `state`, `city`, `zipcode`, `county`) VALUES(?, ?, ?, ?, ?, ?)"; 
+            $query = "INSERT INTO `" . $this->_table_name . "` (`npanxx`, `company`, `state`, `city`, `zipcode`, `county`, `rate_center`) VALUES(?, ?, ?, ?, ?, ?, ?)"; 
             $stmt = $this->_db->prepare($query);
-            $stmt->execute(array($this->_npanxx, $this->_company, $this->_state, $this->_city, $this->_zipcode, $this->_county));
+            $stmt->execute(array($this->_npanxx, $this->_company, $this->_state, $this->_city, $this->_zipcode, $this->_county, $this->_rate_center));
         } catch (PDOException $e) {
             return false;
-
         }
         return true;
     }
