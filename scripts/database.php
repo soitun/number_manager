@@ -20,9 +20,8 @@ class scripts_database {
 
     public function create() {
         // Bandwidth old
-        /*$current_area_code = trim(fgets($this->_file));
         $objBandwidthOld = new providers_bandwidthold_provider();
-        $objBandwidthOld->create();*/
+        $objBandwidthOld->create();
 
         while (!feof($this->_file)) {
             $current_area_code = trim(fgets($this->_file));

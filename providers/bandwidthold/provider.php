@@ -152,16 +152,16 @@ class providers_bandwidthold_provider extends providers_aprovider {
                 echo "  Found $quantity numbers!\n";
 
                 if ($quantity != 0) {
-                    if ($quantity == 500) {
+                    /*if ($quantity == 500) {
                         echo "  NOTICE: This is probably not the full list. Re-running the query with an additional search parameter...\n";
                         // If you get 500 numbers back, there are more to be had! But bandwidth.com won't send them to you :(
                         // Figure out all the prefixes in the numbers list and then run a second query for each prefix to get the full list
                         $prefixes = array();
 
-                        /*foreach ($numbers as $number => $v) {
+                        foreach ($numbers as $number => $v) {
                             $prefixes[substr($number, 2, 5)] = true;
                         }
-                        $prefixes = array_keys($prefixes);*/
+                        $prefixes = array_keys($prefixes);
 
                         $quantity = $this->_search_numbers($rate_center, $numbers, $prefixes);
                         echo "  Found $quantity numbers on second try!\n";
@@ -169,7 +169,9 @@ class providers_bandwidthold_provider extends providers_aprovider {
                         // Still returning 5000+ numbers? Make another query to split this prefix into tenths
                         // You can work around this - find all the prefixes of the numbers that were just returned and then query each prefix (i.e. if you got 4158867900 go re-run the query for 415886)
                         // If you get back 5000 numbers, you have hit yet another limit of their API. This time we need to get more aggressive - do 10 queries for 4158861, 4158862, 4158863, etc. thru 4158869
-                    }
+                    }*/
+
+                    $arr_numbers = array();
 
                     foreach ($numbers as $number => $data) {
                         //echo 'Adding number (' . $number . ") to the database\n";
@@ -186,6 +188,9 @@ class providers_bandwidthold_provider extends providers_aprovider {
 
                     // And finally inserting the blocks
                     $this->_insert_block($arr_numbers);
+
+                    // Destroying arr_numbers... Because!
+                    $arr_numbers = null;
 
                     // We need to reset zerocheck to zero to make sure it will go
                     // through the process next time
