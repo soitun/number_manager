@@ -26,12 +26,14 @@ class scripts_database {
 
         // O1
 
-        // Bandwidth
         while (!feof($this->_file)) {
             $current_area_code = trim(fgets($this->_file));
+
+            // Bandwidth
             /*$objBandwidth = new providers_bandwidth_provider();
             $objBandwidth->create($current_area_code);*/
 
+            // O1
             $objO1 = new providers_o1_provider();
             $objO1->create($current_area_code);
         }
@@ -48,15 +50,19 @@ class scripts_database {
 
     public function update() {
         // Bandwidth old
-        $current_area_code = trim(fgets($this->_file));
+        /*$current_area_code = trim(fgets($this->_file));
         $objBandwidthOld = new providers_bandwidthold_provider();
-        $objBandwidthOld->update();
+        $objBandwidthOld->update();*/
 
-        // Bandwidth
         while (!feof($this->_file)) {
-            /*$current_area_code = trim(fgets($this->_file));
-            $objBandwidth = new providers_bandwidth_provider();
+            $current_area_code = trim(fgets($this->_file));
+
+            // Bandwidth
+            /*$objBandwidth = new providers_bandwidth_provider();
             $objBandwidth->update($current_area_code);*/
+
+            $objO1 = new providers_o1_provider();
+            $objO1->update($current_area_code);
         }
     }
 
