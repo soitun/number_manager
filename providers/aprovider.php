@@ -2,6 +2,7 @@
 
 abstract class providers_aprovider {
     protected $_obj_block;
+    protected $_obj_number;
     protected $_settings;
     protected $_constants;
     protected $_provider_name;
@@ -18,6 +19,10 @@ abstract class providers_aprovider {
 
         $this->_obj_number = new models_number($this->_provider_name);
         $this->_obj_block = new models_block($this->_provider_name);
+    }
+
+    function __destruct() {
+        
     }
 
     // The numbers in the array must be sorted from lowest to highest

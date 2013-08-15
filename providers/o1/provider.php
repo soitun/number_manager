@@ -85,7 +85,10 @@ class providers_o1_provider extends providers_aprovider {
     }
 
     public function create($area_code) {
-        echo "Adding number for area_code $area_code\n";
+        if (!$area_code)
+            return;
+
+        echo "Adding number for area_code $area_code (" . $this->_provider_name . ")\n";
         $arr_numbers = array();
 
         $response = $this->_get_numbers_from_npa($area_code);
@@ -116,7 +119,10 @@ class providers_o1_provider extends providers_aprovider {
     }
 
     public function update($area_code) {
-        echo "Updating number for area_code $area_code\n";
+        if (!$area_code)
+            return;
+
+        echo "Updating number for area_code $area_code (" . $this->_provider_name . ")\n";
         $arr_numbers = array();
 
         $response = $this->_get_numbers_from_npa($area_code);

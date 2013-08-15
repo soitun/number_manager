@@ -2,7 +2,6 @@
 
 class providers_bandwidth_provider extends providers_aprovider {
     private $_curl;
-    private $_obj_number;
     private $_obj_tollfree;
 
     function __construct() {
@@ -57,42 +56,50 @@ class providers_bandwidth_provider extends providers_aprovider {
 
     public function create($area_code) {
         if (!$area_code)
-            die("Empty area code\n");
+            return;
+
+        echo "Adding number for area_code $area_code (" . $this->_provider_name . ")\n";
+        $arr_numbers = array();
 
         $xml_result = $this->_get_available_npa_nxx($area_code);
-        foreach ($xml_result->AvailableNpaNxxList->AvailableNpaNxx as $result) {
-            //$this->_obj_number->start_transaction();
+        if (!empty($xml_result->AvailableNpaNxxList->AvailableNpaNxx)) {
+            foreach ($xml_result->AvailableNpaNxxList->AvailableNpaNxx as $result) {
+                //$this->_obj_number->start_transaction();
 
-            $city = $result->City;
-            $state = $result->State;
-            $npanxx = $result->Npa . $result->Nxx;
+                $city = $result->City;
+                $state = $result->State;
+                $npanxx = $result->Npa . $result->Nxx;
 
-            $xml_number_result = $this->_get_available_numbers_by_npa_nxx($npanxx);
+                $xml_number_result = $this->_get_available_numbers_by_npa_nxx($npanxx);
 
-            $this->_obj_number->create_db('US_' . $area_code);
+                $this->_obj_number->create_db('US_' . $area_code);
 
-            // Numbers array
-            $arr_numbers = array();
-            foreach ($xml_number_result->TelephoneNumberList->TelephoneNumber as $number) {
-                $this->_obj_number->set_number('1' . $number);
-                $this->_obj_number->set_city($city);
-                $this->_obj_number->set_state($state);
-                $this->_obj_number->insert();
+                // Numbers array
+                $arr_numbers = array();
+                foreach ($xml_number_result->TelephoneNumberList->TelephoneNumber as $number) {
+                    $this->_obj_number->set_number('1' . $number);
+                    $this->_obj_number->set_city($city);
+                    $this->_obj_number->set_state($state);
+                    $this->_obj_number->insert();
 
-                // building the number array
-                $arr_numbers[] = (int)'1' . $number;
+                    // building the number array
+                    $arr_numbers[] = (int)'1' . $number;
+                }
+
+                $this->_insert_block($arr_numbers);
+
+                //$this->_obj_number->commit();
+                sleep($this->_settings->wait_timer);
             }
-
-            $this->_insert_block($arr_numbers);
-
-            //$this->_obj_number->commit();
-            sleep($this->_settings->wait_timer);
         }
     }
 
     public function update($area_code) {
         if (!$area_code)
-            die("Empty area code\n");
+            return;
+
+        echo "Updating number for area_code $area_code (" . $this->_provider_name . ")\n";
+        $arr_numbers = array();
 
         $this->_obj_number->set_db_name('US_' . $area_code);
 
