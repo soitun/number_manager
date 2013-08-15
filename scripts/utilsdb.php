@@ -16,7 +16,7 @@ class scripts_utilsdb {
         }
     }
 
-    private function _count($db_name) {
+    private static function _count($db_name) {
         try {
             $db = scripts_utilsdb::_get_db_instance();
             $stmt = $db->query("SELECT id FROM `". $db_name . "`");
