@@ -74,17 +74,21 @@ class providers_o1_provider extends providers_aprovider {
         $this->_process = $process;
     }
 
-    public function create($area_code) {
-        echo "Adding number for area_code $area_code\n";
-        $this->_obj_number = new models_number("o1");
-        $arr_numbers = array();
-
+    private function _get_numbers_from_npa($area_code) {
         // The data sent to the server
         $post = array(
             'npa' => $area_code,
             'limit' => '500'
         );
-        $response = $this->_send('json', '/Dids/search', $post);
+
+        return $this->_send('json', '/Dids/search', $post);
+    }
+
+    public function create($area_code) {
+        echo "Adding number for area_code $area_code\n";
+        $arr_numbers = array();
+
+        $response = $this->_get_numbers_from_npa($area_code);
 
         if (!empty($response)) {
             // Just making sure that the table exist
@@ -103,7 +107,7 @@ class providers_o1_provider extends providers_aprovider {
                 $this->_obj_number->set_number_identifier($number);
                 $this->_obj_number->insert();
 
-                $arr_numbers[] = $number;
+                $arr_numbers[] = '1' . $number;
             }
         }
 
@@ -111,7 +115,45 @@ class providers_o1_provider extends providers_aprovider {
         $this->_insert_block($arr_numbers);
     }
 
-    public function update() {
-        return;
+    public function update($area_code) {
+        echo "Updating number for area_code $area_code\n";
+        $arr_numbers = array();
+
+        $response = $this->_get_numbers_from_npa($area_code);
+
+        if (!empty($response)) {
+            // Just making sure that the table exist
+            $this->_obj_number->set_db_name('US_' . $area_code);
+            $this->_obj_number->start_transaction();
+
+            if (!$this->_obj_number->delete_like_number('1' . $area_code))
+                $this->_obj_number->rollback();
+
+            foreach ($response->dids as $did) {
+                // Location is something like 'Stockton, CA'
+                $location_exp = explode(',', $did->did->location);
+                $city = trim($location_exp[0]);
+                $state = trim($location_exp[1]);
+                $number = $did->did->tn;
+
+                $this->_obj_number->set_number('1' . $number);
+                $this->_obj_number->set_city($city);
+                $this->_obj_number->set_state($state);
+                $this->_obj_number->set_number_identifier($number);
+                $this->_obj_number->insert();
+
+                $arr_numbers[] = '1' . $number;
+            }
+        }
+
+        $this->_obj_block->start_transaction();
+
+        if (!$this->_obj_block->delete_like_number('1' . $area_code))
+            $this->_obj_block->rollback();
+
+        $this->_insert_block($arr_numbers);
+
+        $this->_obj_number->commit();
+        $this->_obj_block->commit();
     }
 }

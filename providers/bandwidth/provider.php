@@ -59,10 +59,6 @@ class providers_bandwidth_provider extends providers_aprovider {
         if (!$area_code)
             die("Empty area code\n");
 
-        // Creating models
-        $this->_obj_number = new models_number("bandwidth");
-        $this->_obj_block = new models_block("bandwidth");
-
         $xml_result = $this->_get_available_npa_nxx($area_code);
         foreach ($xml_result->AvailableNpaNxxList->AvailableNpaNxx as $result) {
             //$this->_obj_number->start_transaction();
@@ -97,10 +93,6 @@ class providers_bandwidth_provider extends providers_aprovider {
     public function update($area_code) {
         if (!$area_code)
             die("Empty area code\n");
-
-        // Creating models
-        $this->_obj_number = new models_number("bandwidth");
-        $this->_obj_block = new models_block("bandwidth");
 
         $this->_obj_number->set_db_name('US_' . $area_code);
 
