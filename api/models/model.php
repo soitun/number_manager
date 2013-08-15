@@ -1,5 +1,7 @@
 <?php 
 
+require_once LIB_BASE . 'KLogger.php';
+
 /**
  * Basic model
  * @author Francis Genet
@@ -9,9 +11,11 @@ class models_model {
     // Class attribute
     protected $_db;
     protected $_settings;
+    protected $_log;
 
     function __construct() {
         $this->_settings = helper_settings::get_instance();
+        $this->_log = KLogger::instance(LOGS_PATH, Klogger::DEBUG);
 
         if (!$this->_init_mysql())
             return false;

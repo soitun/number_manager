@@ -35,25 +35,28 @@ class models_numbers extends models_model {
         $this->_exist = false;
 
         if ($number && $country) {
-            $this->_db_name = $this->get_db_name($number, $country);
-            $query = "SELECT * FROM `" . $this->_db_name . "` WHERE `number` = ?";
-            $stmt = $this->_db->prepare($query);
-            $stmt->execute(array($number));
+            try {
+                $this->_db_name = $this->get_db_name($number, $country);
+                $query = "SELECT * FROM `" . $this->_db_name . "` WHERE `number` = ?";
+                $stmt = $this->_db->prepare($query);
+                $stmt->execute(array($number));
 
-            if ($stmt->rowCount()) {
-                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                $this->_id = $result[0]['id'];
-                $this->_number = $result[0]['number'];
-                $this->_provider = $result[0]['provider'];
-                $this->_last_update = $result[0]['last_update'];
-                $this->_city = $result[0]['city'];
-                $this->_state = $result[0]['state'];
-                $this->_number_identifier = $result[0]['number_identifier'];
-                $this->_exist = true;
-
-                return true;
-            } else return false;
-        } else return false;
+                if ($stmt->rowCount()) {
+                    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $this->_id = $result[0]['id'];
+                    $this->_number = $result[0]['number'];
+                    $this->_provider = $result[0]['provider'];
+                    $this->_last_update = $result[0]['last_update'];
+                    $this->_city = $result[0]['city'];
+                    $this->_state = $result[0]['state'];
+                    $this->_number_identifier = $result[0]['number_identifier'];
+                    $this->_exist = true;
+                }
+            } catch(PDOException $e) {
+                $this->_log->logFatal($e);
+                exit('{"status": "error", "data"}');
+            } 
+        }
     }
 
     public function search_by_number($pattern, $country, $limit = null, $offset = null) {

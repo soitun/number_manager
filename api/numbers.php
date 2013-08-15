@@ -20,7 +20,7 @@ class Numbers {
 
             // I think that I need to that to make the provider class name variable
             // new providers_{$provider}_sdk does not seems to work
-            $model_name = "providers_" . $provider . "_sdk";
+            $model_name = "providers_" . $provider . "_provider";
             $provider_obj = new $model_name();
 
             $check_result = $provider_obj->check_status($number, $country);
@@ -37,7 +37,7 @@ class Numbers {
             $identifier = $number_obj->get_number_identifier();
 
             $provider = $number_obj->get_provider();
-            $model_name = "providers_" . $provider . "_sdk";
+            $model_name = "providers_" . $provider . "_provider";
             $provider_obj = new $model_name();
             
             // The numbers should be ordered first.
@@ -60,6 +60,7 @@ class Numbers {
     function options() {
         return;
     }
+
     /**
      * Do a research by states
      *
@@ -188,7 +189,7 @@ class Numbers {
     /**
      * Check number(s) status
      *
-     * @url GET /{country}/status
+     * @url POST /{country}/status
      */
     function status($request_data, $country) {
         $country_obj = new models_country($country);
@@ -198,7 +199,7 @@ class Numbers {
             $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
             $provider = $number_obj->get_provider();
 
-            $model_name = "providers_" . $provider . "_sdk";
+            $model_name = "providers_" . $provider . "_provider";
             $provider_obj = new $model_name();
 
             $check_result = $provider_obj->check_status($number, $country);

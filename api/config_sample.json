@@ -19,6 +19,16 @@
                 "username": "",
                 "password": "!",
                 "wait_timer": "0"
+            },
+            "bandwidthold": {
+                "developer_key": "",
+                "api_url": ""
+            },
+            "o1": {
+                "auth_key": "",
+                "auth_secret": "",
+                "api_url": "",
+                "profiles": []
             }
         },
 
@@ -31,6 +41,16 @@
                 "username": "",
                 "password": "",
                 "wait_timer": "2"
+            },
+            "bandwidthold": {
+                "developer_key": "",
+                "api_url": ""
+            },
+            "o1": {
+                "auth_key": "",
+                "auth_secret": "",
+                "api_url": "",
+                "profiles": []
             }
         }
     }
