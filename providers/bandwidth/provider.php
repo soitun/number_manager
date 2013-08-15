@@ -80,6 +80,7 @@ class providers_bandwidth_provider extends providers_aprovider {
                     $this->_obj_number->set_number('1' . $number);
                     $this->_obj_number->set_city($city);
                     $this->_obj_number->set_state($state);
+                    $this->_obj_number->set_number_identifier($number);
                     $this->_obj_number->insert();
 
                     // building the number array
