@@ -1,11 +1,11 @@
 <?php 
 
 /**
- * Bandwidth SDK (Not sure if I can really called that a SDK)
+ * Bandwidth provider
  * @author Francis Genet
  * @package Number_manager_api
  */
-class providers_bandwidth_sdk {
+class providers_bandwidth_provider {
     private $_curl;
     private $_settings;
     private $_obj_number;
