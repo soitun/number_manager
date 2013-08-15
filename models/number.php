@@ -132,8 +132,8 @@ class models_number extends models_model {
         $like = $number . '%';
 
         try {
-            $stmt = $this->_db->prepare("DELETE FROM `" . $this->_db_name . "` WHERE `number` LIKE ?");
-            $stmt->execute(array($like));
+            $stmt = $this->_db->prepare("DELETE FROM `" . $this->_db_name . "` WHERE `number` LIKE ? AND `provider` = ?");
+            $stmt->execute(array($like, $this->_provider));
         } catch (PDOException $e) {
             echo $e->getMessage() . "\n";
             return false;

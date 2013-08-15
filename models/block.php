@@ -73,8 +73,8 @@ class models_block extends models_model {
         $like = $number . '%';
 
         try {
-            $stmt = $this->_db->prepare("DELETE FROM `blocks` WHERE `start_number` LIKE ?");
-            $stmt->execute(array($like));
+            $stmt = $this->_db->prepare("DELETE FROM `blocks` WHERE `start_number` LIKE ? AND `provider` = ?");
+            $stmt->execute(array($like, $this->_provider));
         } catch (PDOException $e) {
             echo $e->getMessage() . "\n";
             return false;

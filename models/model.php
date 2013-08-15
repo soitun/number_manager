@@ -17,7 +17,7 @@ abstract class models_model {
 
         $general_settings = helper_settings::get_instance();
         if ($this->_provider)
-            $this->_provider_settings = $general_settings->providers->{ENVIRONMENT}->$provider;
+            $this->_provider_settings = $general_settings->providers->{ENVIRONMENT}->{$this->_provider};
         $this->_database_settings = $general_settings->database;
 
         $this->_init_mysql();
