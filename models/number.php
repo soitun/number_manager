@@ -51,7 +51,7 @@ class models_number extends models_model {
               `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               `city` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
               `state` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `number_indentifier` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+              `number_identifier` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
               PRIMARY KEY (`id`),
               UNIQUE KEY `number` (`number`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;";
