@@ -56,6 +56,7 @@ class Numbers {
      * @url OPTIONS /{country}/order
      * @url OPTIONS /{country}/status
      * @url OPTIONS /{country}/_block_status
+     * @url OPTIONS /{country}/meta
      */
     function options() {
         return;
