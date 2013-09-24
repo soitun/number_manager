@@ -27,7 +27,9 @@ class models_location extends models_model {
     }
 
     public function set_city($city) {
-        $this->_city = $city;
+        // A city name should look like "Cliffside Park"
+        // and not "CLIFFSIDE PARK"
+        $this->_city = ucwords(strtolower($city));
     }
 
     public function set_state($state) {
