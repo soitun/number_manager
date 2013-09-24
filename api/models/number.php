@@ -16,6 +16,7 @@ class models_numbers extends models_model {
     private $_db_name;
     private $_number_identifier;
     private $_list_numbers;
+    private $_metaObj;
 
     public function get_number() {
         return $this->_number;
@@ -29,6 +30,10 @@ class models_numbers extends models_model {
         return $this->_number_identifier;
     }
 
+    public function get_metaObj() {
+        return $this->_metaObj;
+    }
+
     // $number must be like 
     function __construct($number = null, $country = null) {
         parent::__construct();
@@ -36,6 +41,8 @@ class models_numbers extends models_model {
 
         if ($number && $country) {
             try {
+                $this->_metaObj = new models_metadata();
+
                 $this->_db_name = $this->get_db_name($number, $country);
                 $query = "SELECT * FROM `" . $this->_db_name . "` WHERE `number` = ?";
                 $stmt = $this->_db->prepare($query);
@@ -51,10 +58,13 @@ class models_numbers extends models_model {
                     $this->_state = $result[0]['state'];
                     $this->_number_identifier = $result[0]['number_identifier'];
                     $this->_exist = true;
+
+                    // Retrieving metadata
+                    $this->_metaObj->get_metadata($number, $country);
                 }
             } catch(PDOException $e) {
                 $this->_log->logFatal($e);
-                exit('{"status": "error", "data"}');
+                exit('{"status": "error", "data": {}}');
             } 
         }
     }

@@ -220,6 +220,22 @@ class Numbers {
     /**
      * Check number(s) status
      *
+     * @url POST /{country}/meta
+     */
+    function search_meta($request_data, $country) {
+        $return = array("data" => array());
+        $numbers = $request_data['data'];
+        foreach ($numbers as $number) {
+            $numberObj = new models_number($number, $country);
+            $return['data'][$number] = $numberObj->get_metaObj()->to_array();
+        }
+
+        return $return;
+    }
+
+    /**
+     * Check number(s) status
+     *
      * @url GET /{country}/_block_status
      */
     function block_status($request_data, $country) {
