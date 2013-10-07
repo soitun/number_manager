@@ -45,6 +45,21 @@ class models_country extends models_model {
         }
     }
 
+    public function get_country($number) {
+        $prefix = substr($number, 0, -10);
+        $prefix = str_replace('+', '', $prefix);
+
+        $query = "SELECT `iso_code` FROM `countries` WHERE `prefix` = ?";
+        $stmt = $this->_db->prepare($query);
+        $stmt->execute(array($prefix));
+
+        if ($stmt->rowCount()) {
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC)[0];
+            return $result['iso_code'];
+        } else 
+            return false;
+    }
+
     function __destruct() {
         parent::__destruct();
     }

@@ -14,6 +14,7 @@
     private $_zipcode;
     private $_county;
     private $_rate_center;
+    private $_country;
 
     public function get_company() {
         return $this->_company;
@@ -39,6 +40,10 @@
         return $this->_rate_center;
     }
 
+    public function get_country() {
+        return $this->_country;
+    }
+
     function __construct() {
         parent::__construct();
     }
@@ -54,27 +59,35 @@
         $npa = substr($number, 0, 3);
         $npanxx = substr($number, 0, 6);
 
-        // Choosing the right table
-        $table_name = 'location_' . $country . '_' . $npa;
-        $query = "SELECT * FROM `" . $table_name . "` WHERE `npanxx` = ?";
-        $stmt = $this->_db->prepare($query);
-        $stmt->execute(array($npanxx));
+        try {
+            // Choosing the right table
+            $table_name = 'location_' . $country . '_' . $npa;
+            $query = "SELECT * FROM `" . $table_name . "` WHERE `npanxx` = ?";
 
-        if ($stmt->rowCount()) {
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            $this->_number = $number;
-            $this->_npanxx = $npanxx;
-            $this->_company = $result[0]['company'];
-            $this->_state = $result[0]['state'];
-            $this->_city = $result[0]['city'];
-            $this->_zipcode = $result[0]['zipcode'];
-            $this->_county = $result[0]['county'];
-            $this->_rate_center = $result[0]['rate_center'];
+            $stmt = $this->_db->prepare($query);
+            $stmt->execute(array($npanxx));
+
+            if ($stmt->rowCount()) {
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $this->_number = $number;
+                $this->_country = $country;
+                $this->_npanxx = $npanxx;
+                $this->_company = $result[0]['company'];
+                $this->_state = $result[0]['state'];
+                $this->_city = $result[0]['city'];
+                $this->_zipcode = $result[0]['zipcode'];
+                $this->_county = $result[0]['county'];
+                $this->_rate_center = $result[0]['rate_center'];
+            }
+        } catch (Exception $e) {
+            return false;
         }
     }
 
     public function to_array() {
-        $return  = array();
+        $return = array();
+        $return['country'] = $this->_country;
+        $return['npanxx'] = $this->_npanxx;
         $return['company'] = $this->_company;
         $return['state'] = $this->_state;
         $return['city'] = $this->_city;
