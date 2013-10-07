@@ -99,9 +99,6 @@ class providers_bandwidthold_provider extends providers_aprovider {
 
             // This will * theorically * retrieve the number of numbers returned by the current request
             if (preg_match('/Found Telephone Numbers \((\d*)\)/', $number_result, $match)) {
-
-                print_r($match);
-
                 $quantity += $match[1];
 
                 $lines = explode("\n", $number_result);
