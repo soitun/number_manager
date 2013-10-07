@@ -128,7 +128,7 @@ class Numbers {
     /**
      * Do a block research
      *
-     * @url GET /{country}/block_search
+     * @url GET /block_search
      */
     function block_search($request_data, $country) {
         $pattern = $request_data['pattern'];
@@ -221,13 +221,16 @@ class Numbers {
     /**
      * Check number(s) status
      *
-     * @url POST /{country}/meta
+     * @url POST /meta
      */
-    function search_meta($request_data, $country) {
+    function search_meta($request_data) {
         $return = array("data" => array());
         $numbers = $request_data['data'];
+        $countryObj = new models_country();
+
         foreach ($numbers as $number) {
-            $numberObj = new models_number($number, $country);
+            $country =  $countryObj->get_country($number);
+            $numberObj = new models_number(str_replace('+', '', $number), $country);
             $return['data'][$number] = $numberObj->get_metaObj()->to_array();
         }
 
