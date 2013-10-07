@@ -118,10 +118,10 @@ class models_number extends models_model {
     // Adding number in DB
     public function insert() {
         try {
-            $stmt = $this->_db->prepare("INSERT INTO `" . $this->_db_name . "` (`number`, `provider`, `city`, `state`, `number_indentifier`) VALUES(?, ?, ?, ?, ?)");
+            $stmt = $this->_db->prepare("INSERT INTO `" . $this->_db_name . "` (`number`, `provider`, `city`, `state`, `number_identifier`) VALUES(?, ?, ?, ?, ?)");
             $stmt->execute(array($this->_number, $this->_provider, $this->_city, $this->_state, $this->_number_identifier));
         } catch (PDOException $e) {
-            //echo $e->getMessage() . "\n";
+            echo $e->getMessage() . "\n";
             return false;
         }
 
