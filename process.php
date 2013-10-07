@@ -84,6 +84,12 @@ switch ($command) {
                 scripts_utilsdb::create_locations_tables($country, $area_code_path);
                 break;
 
+            case 'create_city_map':
+                $country = $argv[3];
+                $area_code_path = $argv[4];
+                scripts_utilsdb::create_city_map($country, $area_code_path);
+                break;
+
             case 'insert_locations':
                 $country = $argv[3];
                 $csv_list_path = $argv[4];

@@ -66,6 +66,27 @@ class scripts_utilsdb {
         return true;
     }
 
+    public static function create_city_map($country, $csv_list_paths) {
+        echo "Loading $csv_list_paths...\n";
+        $file_handle = fopen($csv_list_paths, "r");
+
+        $citymap_obj = new models_citymap($country);
+        $citymap_obj->create_table();
+
+        while (($data = fgetcsv($file_handle)) !== FALSE) {
+            echo "Trying to insert " . $data[0] . "(" . $data[4] . ")...\n";
+            $citymap_obj->set_city($data[4]);
+            $citymap_obj->set_npa($data[0]);
+            $citymap_obj->set_state($data[3]);
+            $citymap_obj->insert();
+        }
+
+        // Closing the file
+        echo "Closing $csv_list_paths...\n";
+        fclose($file_handle);
+        return true;
+    }
+
     public static function insert_locations($country, $csv_list_paths){
         echo "Loading $csv_list_paths...\n";
         $file_handle = fopen($csv_list_paths, "r");
