@@ -70,6 +70,7 @@ class models_numbers extends models_model {
     }
 
     public function search_by_number($pattern, $country, $limit = null, $offset = null) {
+        $pattern = '1' . $pattern;
         $like = $pattern . '%';
         $this->_db_name = $this->get_db_name($pattern, $country);
 
@@ -88,9 +89,15 @@ class models_numbers extends models_model {
         $stmt = $this->_db->prepare($query);
         $stmt->execute(array($like));
 
-        if ($stmt->rowCount())
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        else
+        if ($stmt->rowCount()) {
+            $raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $data = array();
+
+            foreach ($raw as $number_obj) {
+                $data['+' . $number_obj['number']] = $number_obj;
+            }
+            return $data;
+        } else
             return false;
     }
 
