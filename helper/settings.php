@@ -12,15 +12,14 @@ class helper_settings {
     private $_objSettings = null;
     private $_file;
 
-    public static function get_instance($filename = 'config.json') {
-        $objSettings = new helper_settings($filename);
+    public static function get_instance($filepath = 'config.json') {
+        $objSettings = new helper_settings($filepath);
         return $objSettings->get_settings();
     }
 
-    public function __construct($filename = 'config.json') {
-        $this->_file = ROOT_PATH . $filename;
-        $arr_file_content = json_decode(file_get_contents($this->_file), true);
-        $this->_objSettings = $this->_array_to_object($arr_file_content);
+    public function __construct($filepath = 'config.json') {
+        $this->_file = $filepath;
+        $this->_objSettings = json_decode(file_get_contents($this->_file));
 
         $error = $this->_json_error();
         if ($error) {
@@ -35,18 +34,6 @@ class helper_settings {
 
     public function set_settings($settings) {
         $this->_objSettings = $settings;
-    }
-
-    private function _array_to_object($array) {
-        $obj = new stdClass;
-        foreach($array as $k => $v) {
-            if(is_array($v)) {
-                $obj->{$k} = $this->_array_to_object($v);
-            } else {
-                $obj->{$k} = $v;
-            }
-        }
-        return $obj;
     }
 
     public function write() {
