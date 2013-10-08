@@ -8,12 +8,12 @@
  * @version 1.0
  */
 
-class Numbers { 
+class Numbers {
     function __construct() {
 
     }
 
-    private function _check_status_bulk($number_list, &$failed_numbers_arr_obj, &$number_arr_obj) {
+    /*private function _check_status_bulk($number_list, &$failed_numbers_arr_obj, &$number_arr_obj) {
         foreach ($number_list as $number) {
             $number_obj = new models_number($country_obj->get_prefix() . $number, $country);
             $provider = $number_obj->get_provider();
@@ -29,20 +29,26 @@ class Numbers {
                 $failed_numbers_arr_obj[] = $number_obj;
             else $number_arr_obj[] = $number_obj;
         }
-    }
+    }*/
 
-    private function _order_bulk($request_data, $number_arr_obj) {
-        foreach ($number_arr_obj as $number_obj) {
-            $number = $number_obj->get_number();
+    private function _order_bulk($request_data, $country, &$failed_numbers_arr) {
+        foreach ($request_data['data']['numbers'] as $number) {
+            $number = str_replace('+', '', $number);
+            $number_obj = new models_number($number, $country);
             $identifier = $number_obj->get_number_identifier();
 
             $provider = $number_obj->get_provider();
             $model_name = "providers_" . $provider . "_provider";
             $provider_obj = new $model_name();
-            
+
+            $order_result = $provider_obj->order($request_data, $identifier);
+
             // The numbers should be ordered first.
-            if(!$provider_obj->order($request_data, $identifier)) {
+            if(!$order_result) {
                 return array("status" => "error", "data" => array("message" => "the $number ($identifier) was not available anymore"));
+            } else {
+                $number_obj->delete();
+                return array("status" => "success", "data" => $order_result);
             }
         }
     }
@@ -154,37 +160,9 @@ class Numbers {
      * @url PUT /{country}/order
      */
     function order($request_data, $country) {
-        $number_list = $request_data['data'];
-        $country_obj = new models_country($country);
-        $failed_numbers_arr_obj = array();
-        $number_arr_obj = array();
+        $failed_numbers_arr = array();
 
-        // I know that the following looks like I am doing too much foreach
-        // However, in this case, we need to do 3 different step.
-
-        // First, we need to check the status for each number
-        $this->_check_status_bulk($number_list, $failed_numbers_arr_obj, $number_arr_obj);        
-
-        // If every numbers are available
-        if (empty($failed_numbers_arr_obj)) {
-            // Then comes the order
-            $this->_order_bulk($request_data, $number_arr_obj);
-            
-            // Then the numbers must be deleted from the cache DB.
-            foreach ($number_arr_obj as $number_obj) {
-                $number_obj->delete();
-            }
-
-            return array("status" => "success", "data" => "The order is a success");
-        } else {
-            foreach ($failed_numbers_arr_obj as $number_obj) {
-                $tmp = array("number" => $number_obj->get_number());
-                $tmp['status'] = "Unavailable";
-                array_push($result, $tmp);
-            }
-
-            return array("status" => "error", "data" => $result);
-        }
+        return $this->_order_bulk($request_data, $country, $failed_numbers_arr);
     }
 
     /**
