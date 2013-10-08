@@ -63,7 +63,8 @@ class models_numbers extends models_model {
                     $this->_metaObj->get_metadata($number, $country);
                 }
             } catch(PDOException $e) {
-                $this->_log->logFatal($e);
+                echo $e->getMessage();
+                //$this->_log->logFatal($e);
                 exit('{"status": "error", "data": {}}');
             } 
         }
@@ -96,6 +97,7 @@ class models_numbers extends models_model {
             foreach ($raw as $number_obj) {
                 $data['+' . $number_obj['number']] = $number_obj;
             }
+
             return $data;
         } else
             return false;
