@@ -28,8 +28,7 @@ class providers_bandwidthold_provider {
             CURLOPT_RETURNTRANSFER => true,
             //CURLOPT_HEADER => true,
             CURLOPT_HTTPHEADER => array(
-                'Content-Type: text/xml', 
-                'X-BWC-IN-Control-Processing-Type: process'
+                'Content-Type: text/xml'
             ),
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false
@@ -74,36 +73,63 @@ class providers_bandwidthold_provider {
     }
 
     public function order($request_data, $identifier) {
-        // We need to retrieve the number id first
-        $timestamp = time();
-        $data = "<?xml version=\"1.0\"?>
-        <basicNumberOrder xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"http://www.bandwidth.com/api/\">
-            <developerKey>" . $this->_settings->developer_key . "</developerKey>
-            <orderName>2600hz-" . $timestamp . "</orderName>
-            <extRefID>" . $request_data['extrefid'] . "</extRefID>
-            <numberIDs>
-                <id>" . $identifier . "</id>
-            </numberIDs>
-            <subscriber>" . $request_data['subscriber'] . "</subscriber>
-            <endPoints>
-                <host>sipproxy001-aa-ord.2600hz.com</host>
-                <host>sipproxy001-aa-dfw.2600hz.com</host>
-            </endPoints>
-        </basicNumberOrder>";
+        $hosts = '';
 
-        $url = $this->_settings->api_url . "numbers.api";
+        foreach ($request_data['data']['hosts'] as $host) {
+            $hosts = $hosts . "&lt;host&gt;$host&lt;/host&gt;";
+        }
+
+$data = <<<XML
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+<s:Header></s:Header>
+<s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<processRequest xmlns="http://www.bandwidth.com/api/">
+<xmlRequest>
+
+&lt;basicNumberOrder xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.bandwidth.com/api/"&gt;
+&lt;developerKey&gt;E46311BA5F241657E9354B2B2DA17620&lt;/developerKey&gt;
+&lt;orderName/&gt;
+&lt;extRefID/&gt;
+&lt;numberIDs&gt;
+&lt;id&gt;$identifier&lt;/id&gt;
+&lt;/numberIDs&gt; 
+&lt;subscriber&gt;VoIP&lt;/subscriber&gt;
+&lt;endPoints&gt;
+$hosts
+&lt;/endPoints&gt;
+&lt;/basicNumberOrder&gt;
+
+</xmlRequest>
+</processRequest>
+</s:Body>
+</s:Envelope>
+
+XML;
+
+        $url = $this->_settings->api_url . "numbers.asmx";
 
         curl_setopt_array($this->_curl, array(
-            CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_URL => $url,
-            CURLOPT_POSTFIELDS => $data
+            CURLOPT_POSTFIELDS => "$data",
+            CURLOPT_POST => true
         ));
 
-        $result = simplexml_load_string(curl_exec($this->_curl));
+        $curl_result = curl_exec($this->_curl);
 
-        if ($result->status == "success")
-            return true;
-        else return false;
+        $xml = new SimpleXMLElement($curl_result); 
+        $xml->registerXPathNamespace("soap", "http://www.w3.org/2003/05/soap-envelope");
+        $response_body = $xml->xpath("//soap:Body")[0]->processRequestResponse->response;
+
+        $return_arr = array();
+        if ($response_body->status == "success") {
+            $return_arr['status'] = (string)$response_body->status;
+            $return_arr['request_id'] = (string)$response_body->requestID;
+            $return_arr['order_id'] = (string)$response_body->numberOrder->orderID;
+            $return_arr['order_number'] = (string)$response_body->numberOrder->orderNumber;
+            $return_arr['order_name'] = (string)$response_body->numberOrder->orderName;
+            $return_arr['number_id'] = (string)$response_body->numberOrder->telephoneNumbers->telephoneNumber->numberID;
+            return $return_arr;
+        } else return false;
     }
 }
 
