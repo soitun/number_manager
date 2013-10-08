@@ -70,11 +70,11 @@ class scripts_utilsdb {
         echo "Loading $csv_list_paths...\n";
         $file_handle = fopen($csv_list_paths, "r");
 
-        $citymap_obj = new models_citymap($country);
-        $citymap_obj->create_table();
+        $mastercitymap_obj = new models_citymap($country);
+        $mastercitymap_obj->create_table();
 
         while (($data = fgetcsv($file_handle)) !== FALSE) {
-            echo "Trying to insert " . $data[0] . "(" . $data[4] . ")...\n";
+            $citymap_obj = new models_citymap($country);
             $citymap_obj->set_city($data[4]);
             $citymap_obj->set_npa($data[0]);
             $citymap_obj->set_state($data[3]);
