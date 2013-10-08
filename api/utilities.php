@@ -17,9 +17,56 @@ class Utilities {
      * Options requests
      *
      * @url OPTIONS /countries
+     * @url OPTIONS /location
      */
     function options() {
         return;
+    }
+
+    /**
+     * Get all the supported countries and their infos
+     *
+     * @url POST /location
+     */
+    function get_location($request_data) {
+        $return = array("data" => array());
+        $numbers = $request_data['data'];
+        $countryObj = new models_country();
+        $metaObj = new models_metadata();
+
+        foreach ($numbers as $number) {
+            $country =  $countryObj->get_country($number);
+            $metaObj->get_metadata($number, $country);
+            $return['data'][$number] = $metaObj->to_array();
+        }
+
+        if (!count($return['data'])) {
+            $return['status'] = "error";
+            $return['data']['message'] = "Could not find any data for this(those) numbers";
+        }
+
+        return $return;
+    }
+
+    /**
+     * Get all the supported countries and their infos
+     *
+     * @url GET /{country}/city
+     */
+    function get_prefix_by_city($request_data, $country) {
+        $return = array("status" => "", "data" => array());
+        $pattern = $request_data['pattern'];
+        $citymap_obj = new models_citymap($country);
+
+        $citymap_result = $citymap_obj->get_prefix_by_cityname($pattern);
+        foreach ($citymap_result as $city_info) {
+            $expl_npa = explode(',', $city_info['npa']);
+            $return['data'][$city_info['city']]['state'] = $city_info['state'];
+            $return['data'][$city_info['city']]['prefixes'] = $expl_npa;
+        }
+        $return['status'] = 'success';
+
+        return $return;
     }
 
     /**
