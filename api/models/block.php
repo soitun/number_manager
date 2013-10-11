@@ -35,7 +35,7 @@ class models_block extends models_model {
             $return_array = array();
             foreach ($fetch as $item) {
                 $item['size'] = $size;
-                $item['end_number'] = (string)($item['start_number'] + ($size - 1));
+                $item['end_number'] = '+' . (string)($item['start_number'] + ($size - 1));
                 unset($item['id']);
                 unset($item['provider']);
                 array_push($return_array, $item);
