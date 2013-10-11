@@ -134,7 +134,7 @@ class Numbers {
     /**
      * Do a block research
      *
-     * @url GET /block_search
+     * @url GET /{country}/block_search
      */
     function block_search($request_data, $country) {
         $pattern = $request_data['pattern'];
