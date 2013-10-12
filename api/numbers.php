@@ -47,7 +47,7 @@ class Numbers {
             if(!$order_result) {
                 return array("status" => "error", "data" => array("message" => "the $number ($identifier) was not available anymore"));
             } else {
-                $number_obj->delete();
+                //$number_obj->delete();
                 return array("status" => "success", "data" => $order_result);
             }
         }
