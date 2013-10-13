@@ -31,26 +31,35 @@ class Numbers {
         }
     }*/
 
-    private function _order_bulk($request_data, $country, &$failed_numbers_arr) {
+    private function _order_bulk($request_data, $country) {
+        $success_numbers_arr = array();
+        $failed_numbers_arr = array();
+
         foreach ($request_data['data']['numbers'] as $number) {
             $number = str_replace('+', '', $number);
             $number_obj = new models_number($number, $country);
-            $identifier = $number_obj->get_number_identifier();
+            if ($number_obj) {
+                $identifier = $number_obj->get_number_identifier();
 
-            $provider = $number_obj->get_provider();
-            $model_name = "providers_" . $provider . "_provider";
-            $provider_obj = new $model_name();
+                $provider = $number_obj->get_provider();
+                $model_name = "providers_" . $provider . "_provider";
+                $provider_obj = new $model_name();
 
-            $order_result = $provider_obj->order($request_data, $identifier);
+                $order_result = $provider_obj->order($request_data, $identifier);
 
-            // The numbers should be ordered first.
-            if(!$order_result) {
-                return array("status" => "error", "data" => array("message" => "the $number ($identifier) was not available anymore"));
+                // The numbers should be ordered first.
+                if(!$order_result) {
+                    $failed_numbers_arr[$number] = array("status" => "error", "reason" => "the $number ($identifier) was not available anymore");
+                } else {
+                    //$number_obj->delete();
+                    $success_numbers_arr[$number] = array("status" => "success", "data" => $order_result);
+                }
             } else {
-                //$number_obj->delete();
-                return array("status" => "success", "data" => $order_result);
+                $failed_numbers_arr[$number] = array("status" => "error", "reason" => "This number is not in our database anymore. Maybe it was bought already");
             }
         }
+
+        return array("success" => $success_numbers_arr, "error" => $failed_numbers_arr);
     }
 
     /**
@@ -162,7 +171,12 @@ class Numbers {
     function order($request_data, $country) {
         $failed_numbers_arr = array();
 
-        return $this->_order_bulk($request_data, $country, $failed_numbers_arr);
+        $result = $this->_order_bulk($request_data, $country, $failed_numbers_arr);
+
+        if (count($result['error']))
+            return array("status" => "error", "data" => $result['error']);
+        else 
+            return array("status" => "success", "data" => $result['success']);
     }
 
     /**
