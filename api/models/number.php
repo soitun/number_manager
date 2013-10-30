@@ -71,7 +71,12 @@ class models_numbers extends models_model {
     }
 
     public function search_by_number($pattern, $country, $limit = null, $offset = null) {
-        $pattern = '1' . $pattern;
+        // If the number is something like +14158867900
+        if (strlen($pattern) == 12)
+            $pattern = substr($pattern, 1);
+        else // This should then be a area code like 415
+            $pattern = '1' . $pattern;
+
         $like = $pattern . '%';
         $this->_db_name = $this->get_db_name($pattern, $country);
 
