@@ -34,10 +34,14 @@ class Numbers {
     private function _order_bulk($request_data, $country) {
         $success_numbers_arr = array();
         $failed_numbers_arr = array();
+        $countryObj = new models_country();
+        $metaObj = new models_metadata();
 
-        foreach ($request_data['data']['numbers'] as $number) {
-            $number = str_replace('+', '', $number);
+        foreach ($request_data['data']['numbers'] as $plus_number) {
+            $number = str_replace('+', '', $plus_number);
             $number_obj = new models_number($number, $country);
+            $metaObj->get_metadata($number, $country);
+
             if ($number_obj) {
                 $identifier = $number_obj->get_number_identifier();
 
@@ -46,16 +50,17 @@ class Numbers {
                 $provider_obj = new $model_name();
 
                 $order_result = $provider_obj->order($request_data, $identifier);
+                $order_result['locality'] = $metaObj->to_array();
 
                 // The numbers should be ordered first.
                 if(!$order_result) {
-                    $failed_numbers_arr[$number] = array("status" => "error", "reason" => "the $number ($identifier) was not available anymore");
+                    $failed_numbers_arr[$plus_number] = array("status" => "error", "reason" => "the $number ($identifier) was not available anymore");
                 } else {
                     //$number_obj->delete();
-                    $success_numbers_arr[$number] = array("status" => "success", "data" => $order_result);
+                    $success_numbers_arr[$plus_number] = $order_result;
                 }
             } else {
-                $failed_numbers_arr[$number] = array("status" => "error", "reason" => "This number is not in our database anymore. Maybe it was bought already");
+                $failed_numbers_arr[$plus_number] = array("status" => "error", "reason" => "This number is not in our database anymore. Maybe it was bought already");
             }
         }
 
@@ -175,7 +180,7 @@ class Numbers {
 
         if (count($result['error']))
             return array("status" => "error", "data" => $result['error']);
-        else 
+        else
             return array("status" => "success", "data" => $result['success']);
     }
 
