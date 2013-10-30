@@ -37,6 +37,7 @@ class Utilities {
         foreach ($numbers as $number) {
             $country =  $countryObj->get_country($number);
             $metaObj->get_metadata($number, $country);
+            $return['status'] = 'success';
             $return['data'][$number] = $metaObj->to_array();
         }
 
