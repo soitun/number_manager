@@ -56,7 +56,7 @@ class Numbers {
                 if(!$order_result) {
                     $failed_numbers_arr[$plus_number] = array("status" => "error", "reason" => "the $number ($identifier) was not available anymore");
                 } else {
-                    //$number_obj->delete();
+                    $number_obj->delete();
                     $success_numbers_arr[$plus_number] = $order_result;
                 }
             } else {

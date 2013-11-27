@@ -114,17 +114,17 @@ XML;
             CURLOPT_POST => true
         ));
 
-        // This is a dumb response for testing purpose
+        /*// This is a dumb response for testing purpose
         $return_arr['request_id'] = "4986219d-c105-4d1c-9d11-082b2ac3d3cb";
         $return_arr['order_id'] = "eb33808c-91f1-45eb-bfcf-445565bd3313";
         $return_arr['order_number'] = "1000000000001005281";
         $return_arr['order_name'] = "API Number Order 10/11/2013 10:00 PM";
         $return_arr['number_id'] = "CC88D310-A447-4C2C-A043-AD4771F1E778";
-        return $return_arr;
+        return $return_arr;*/
 
         //return false;
  
-        /*$curl_result = curl_exec($this->_curl);
+        $curl_result = curl_exec($this->_curl);
 
         $xml = new SimpleXMLElement($curl_result); 
         $xml->registerXPathNamespace("soap", "http://www.w3.org/2003/05/soap-envelope");
@@ -139,7 +139,7 @@ XML;
             $return_arr['order_name'] = (string)$response_body->numberOrder->orderName;
             $return_arr['number_id'] = (string)$response_body->numberOrder->telephoneNumbers->telephoneNumber->numberID;
             return $return_arr;
-        } else return false;*/
+        } else return false;
     }
 }
 
