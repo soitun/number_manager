@@ -243,7 +243,7 @@ class Numbers {
      *
      * @url POST /{country}/meta
      */
-    function search_meta($request_data, $country) {
+    function search_new_meta($request_data, $country) {
         $return = array("data" => array());
         $numbers = $request_data['data'];
 
