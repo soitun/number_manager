@@ -77,6 +77,7 @@ class Numbers {
      * @url OPTIONS /{country}/status
      * @url OPTIONS /{country}/_block_status
      * @url OPTIONS /{country}/meta
+     * @url OPTIONS /meta
      */
     function options() {
         return;
