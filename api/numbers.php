@@ -218,8 +218,11 @@ class Numbers {
     /**
      * Check number(s) status
      *
+     * This function is kept for compatibilite.
+     * However, you should not use it  
+     *
      * @url POST /meta
-     */
+     */    
     function search_meta($request_data) {
         $return = array("data" => array());
         $numbers = $request_data['data'];
@@ -233,6 +236,25 @@ class Numbers {
 
         return $return;
     }
+
+    /**
+     * Check number(s) status
+     *
+     * @url POST /{country}/meta
+     */
+    function search_meta($request_data, $country) {
+        $return = array("data" => array());
+        $numbers = $request_data['data'];
+
+        foreach ($numbers as $number) {
+            $meta_obj = new models_metadata();
+            $meta_obj->get_metadata($number, $country);
+            $return['data'][$number] = $meta_obj->to_array();
+        }
+
+        return $return;
+    }
+
 
     /**
      * Check number(s) status
