@@ -16,7 +16,7 @@ class models_block extends models_model {
     }
 
     public function get_blocks($area_code, $size, $country, $limit = null, $offset = null) {
-        $like = $area_code . '%';
+        $like = '+1' . $area_code . '%';
 
         if (!$limit && !$offset)
             $query = "SELECT * FROM `blocks` WHERE `size` >= ? AND `start_number` LIKE ? ORDER BY `start_number` ASC LIMIT 10";
@@ -26,6 +26,8 @@ class models_block extends models_model {
             $query = "SELECT * FROM `blocks` WHERE `size` >= ? AND `start_number` LIKE ? ORDER BY `start_number` ASC LIMIT " . $limit;
         else
             return false;
+
+        echo $query;
 
         $stmt = $this->_db->prepare($query);
         $stmt->execute(array($size, $like));
