@@ -27,8 +27,6 @@ class models_block extends models_model {
         else
             return false;
 
-        echo $query;
-
         $stmt = $this->_db->prepare($query);
         $stmt->execute(array($size, $like));
 
