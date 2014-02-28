@@ -110,7 +110,13 @@ switch ($command) {
                 
                 scripts_utilsdb::add_country($name, $iso_code, $local, $toll_free, $vanity, $prefix);
                 break;
-            
+
+            case 'create_numbers_dbs':
+                $country = $argv[3];
+                $area_code_path = $argv[4];
+                scripts_utilsdb::create_numbers_dbs($country, $area_code_path);
+                break;
+
             default:
                 echo("ERROR: Wrong argument\n");
                 echo("Available args: list / count / create_locations_tables / insert_locations / truncate / add_country\n");

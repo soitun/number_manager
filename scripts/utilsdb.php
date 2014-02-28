@@ -134,6 +134,15 @@ class scripts_utilsdb {
 
         return $count;
     }
+
+    public static function create_numbers_dbs($country, $area_code_path) {
+        echo "Loading $area_code_path...\n";
+        $lines = file($area_code_path);
+        foreach ($lines as $row) {
+            $number_obj = new models_number();
+            $number_obj->create_db($country . '_' . trim($row));
+        }
+    }
 }
 
  ?>
