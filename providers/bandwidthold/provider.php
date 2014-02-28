@@ -116,7 +116,7 @@ class providers_bandwidthold_provider extends providers_aprovider {
         return $quantity;
     }
 
-    private function _dowload_numbers($state) {
+    private function _dowload_numbers($state, $update = false) {
         $arr_numbers = array();
         $zerocheck = $this->_zerocheck_obj->get_settings();
         $number_obj = new models_number('bandwidthold');
@@ -149,7 +149,7 @@ class providers_bandwidthold_provider extends providers_aprovider {
                 echo "  Found $quantity numbers!\n";
 
                 if ($quantity != 0) {
-                    /*if ($quantity == 500) {
+                    if ($quantity == 500) {
                         echo "  NOTICE: This is probably not the full list. Re-running the query with an additional search parameter...\n";
                         // If you get 500 numbers back, there are more to be had! But bandwidth.com won't send them to you :(
                         // Figure out all the prefixes in the numbers list and then run a second query for each prefix to get the full list
@@ -166,15 +166,21 @@ class providers_bandwidthold_provider extends providers_aprovider {
                         // Still returning 5000+ numbers? Make another query to split this prefix into tenths
                         // You can work around this - find all the prefixes of the numbers that were just returned and then query each prefix (i.e. if you got 4158867900 go re-run the query for 415886)
                         // If you get back 5000 numbers, you have hit yet another limit of their API. This time we need to get more aggressive - do 10 queries for 4158861, 4158862, 4158863, etc. thru 4158869
-                    }*/
+                    }
 
                     $arr_numbers = array();
 
-                    foreach ($numbers as $number => $data) {
-                        //echo 'Adding number (' . $number . ") to the database\n";
-                        $npa = substr(str_replace('+', '', $number), 1, 3);
-                        $number_obj->create_db('US_' . $npa);
+                    // Just getting the first element and the npa that is going to be used
+                    current($numbers);
+                    next($numbers);
+                    $current_npa = substr(str_replace('+', '', key($numbers)), 1, 3);
 
+                    $number_obj->set_db_name('US_' . $current_npa);
+
+                    if ($update)
+                        $number_obj->delete_like_city();
+
+                    foreach ($numbers as $number => $data) {
                         fputs($fp, $number . "," . $data["RateCenterID"] . "," . $data["telID"] . "\n");
                         $number_obj->set_number($number);
                         $number_obj->set_number_identifier($data["telID"]);
@@ -217,7 +223,7 @@ class providers_bandwidthold_provider extends providers_aprovider {
     public function update() {
         $this->_log_and_setup();
         foreach ($this->_constants->states as $regionID => $state) {
-            $this->_dowload_numbers($state);
+            $this->_dowload_numbers($state, true);
         }
     }
 }

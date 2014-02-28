@@ -95,7 +95,7 @@ class models_number extends models_model {
 
     // ==============
 
-    function __construct($provider) {
+    function __construct($provider = null) {
         parent::__construct($provider);
     }
 
@@ -140,6 +140,29 @@ class models_number extends models_model {
         }
 
         return true;
+    }
+
+    public function delete_like_city() {
+        try {
+            $stmt = $this->_db->prepare("DELETE FROM `" . $this->_db_name . "` WHERE `city` = ? AND `provider` = ?");
+            $stmt->execute(array($this->_city, $this->_provider));
+        } catch (PDOException $e) {
+            echo $e->getMessage() . "\n";
+            return false;
+        }
+
+        return true;
+    }
+
+    public function truncate() {
+        try {
+            $query = "TRUNCATE TABLE " . $this->_db_name;
+            $stmt = $this->_db->prepare($query);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            echo $e->getMessage() . "\n";
+            return false;
+        }
     }
 }
 
